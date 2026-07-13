@@ -1,0 +1,110 @@
+.share-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(2px);
+}
+
+.share-modal {
+    background-color: var(--bg-primary, #212121);
+    color: var(--text-primary, #f0f0f0);
+    border-radius: 12px;
+    width: 450px;
+    max-width: 90%;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    overflow: hidden;
+    animation: popIn 0.2s ease-out;
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.95); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.share-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color, #333);
+}
+
+.share-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.share-content {
+    padding: 20px;
+}
+
+.share-desc {
+    margin: 0 0 15px 0;
+    font-size: 0.95rem;
+    color: var(--text-secondary, #999);
+}
+
+.share-link-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--bg-secondary, #333);
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #444);
+}
+
+.share-link-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-primary, #f0f0f0);
+    font-size: 0.95rem;
+    padding: 8px;
+    outline: none;
+}
+
+.copy-btn {
+    background-color: var(--bg-hover-strong, #444);
+    border: none;
+    color: var(--text-primary, #f0f0f0);
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 1.1rem;
+}
+
+.copy-btn:hover {
+    background-color: #555;
+}
+
+.share-footer {
+    padding: 15px 20px;
+    background-color: var(--bg-secondary, #2a2a2a);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.revoke-btn {
+    background-color: transparent;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.revoke-btn:hover {
+    background-color: #ef4444;
+    color: #fff;
+}

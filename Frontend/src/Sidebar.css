@@ -1,0 +1,344 @@
+.sidebar {
+    background-color: var(--bg-secondary);
+    color: var(--text-secondary);
+    height: 100vh;
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+
+button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: transparent;
+    border: solid 0.5px var(--border-color);
+    cursor: pointer;
+}
+
+.logo {
+    height: 25px;
+    width: 25px;
+    background-color: var(--logo-bg);
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+button span {
+    font-size: 20px;
+}
+
+button:hover {
+    background-color: var(--bg-hover);
+}
+
+.history {
+    margin: 10px;
+    padding: 10px;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.history li {
+    list-style-type: none;
+    cursor: pointer;
+    padding: 8px 12px;
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: var(--border-radius);
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: visible;
+    transition: var(--transition);
+}
+
+.history li:hover {
+    background-color: var(--bg-hover);
+}
+
+.sign {
+    padding: 10px;
+    margin: 10px;
+    font-size: 14px;
+    text-align: center;
+    border-top: solid 0.25px rgba(255, 255, 255, 0.5);
+}
+
+.fa-trash {
+    opacity: 0;
+    position: absolute;
+    right: 0;
+}
+
+.history li:hover .fa-trash {
+    opacity: 1;
+    color: var(--text-hover);
+}
+
+.fa-trash:hover {
+    color: #f87171 !important;
+}
+
+.highlighted {
+    background-color: rgba(139, 92, 246, 0.1); /* Subtle accent color background */
+    color: var(--accent-color);
+    border-radius: var(--border-radius);
+}
+
+/* thread title text */
+.threadTitle {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* three-dot actions area */
+.threadActions {
+    position: relative;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.threadMenuBtn {
+    opacity: 0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: opacity 0.15s ease, background 0.15s ease;
+    cursor: pointer;
+}
+
+.history li:hover .threadMenuBtn {
+    opacity: 1;
+}
+
+.renameInput:focus {
+    outline: none;
+    background-color: var(--bg-hover-strong);
+}
+
+/* ── Pinned Threads ── */
+.threadSection {
+    margin-bottom: 1rem;
+}
+
+.sectionTitle {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 12px 0 8px 8px;
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.pinBtn {
+    font-size: 14px;
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: color 0.2s, background-color 0.2s;
+    opacity: 0;
+}
+
+.history li:hover .pinBtn {
+    opacity: 1;
+}
+
+.pinBtn:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-hover-strong);
+}
+
+.pinBtn.pinned {
+    opacity: 1;
+    color: #339cff;
+}
+
+.threadMenuBtn:hover {
+    background-color: var(--bg-hover);
+}
+
+/* dropdown menu */
+.threadMenu {
+    position: absolute;
+    right: 0;
+    top: 22px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 4px;
+    z-index: 100;
+    min-width: 130px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.threadMenuItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    font-size: 13px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.threadMenuItem:hover {
+    background-color: var(--bg-hover);
+}
+
+.threadMenuItem.danger {
+    color: #f87171;
+}
+
+.threadMenuItem.danger i {
+    color: #f87171;
+}
+
+/* inline rename input */
+.renameInput {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    outline: none;
+    font-size: 14px;
+    width: 100%;
+    padding: 0;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+/* ── Folders ── */
+.folderSection {
+    margin-bottom: 5px;
+}
+
+.folderHeader {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: var(--transition);
+    justify-content: space-between;
+    background-color: var(--bg-tertiary);
+    border: 1px solid transparent;
+    margin-bottom: 8px;
+}
+
+.folderHeader:hover {
+    background-color: var(--bg-hover-strong);
+    border-color: var(--border-color);
+}
+
+.folderHeader span i {
+    margin-right: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.folderActions {
+    opacity: 0;
+    transition: opacity 0.15s;
+    position: relative;
+}
+
+.folderHeader:hover .folderActions {
+    opacity: 1;
+}
+
+.newFolderDiv {
+    margin: 10px 8px;
+}
+
+.newFolderBtn {
+    width: 100%;
+    margin: 0;
+    padding: 8px;
+    font-size: 13px;
+    border: 1px dashed var(--border-color);
+    color: var(--text-secondary);
+    justify-content: center;
+    gap: 8px;
+}
+
+.newFolderBtn:hover {
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+}
+
+.folderRename {
+    color: var(--text-primary);
+}
+
+.folder-submenu-parent {
+    position: relative;
+}
+
+.folder-submenu {
+    display: none;
+    position: absolute;
+    right: 100%;
+    top: 0;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 4px;
+    min-width: 130px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.folder-submenu-parent:hover .folder-submenu {
+    display: block;
+}
+
+/* ── Search Box ── */
+.searchBox {
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    margin: 10px;
+    padding: 10px 12px;
+    gap: 8px;
+}
+
+.searchBox i {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.searchBox input {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    flex: 1;
+    outline: none;
+    font-size: 14px;
+}
+
+.searchBox .clearSearch {
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+.searchBox .clearSearch:hover {
+    opacity: 1;
+}

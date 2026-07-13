@@ -1,0 +1,47 @@
+:root {
+  /* Dark Mode (Default) */
+  --bg-primary: #121212;
+  --bg-secondary: #1a1a1a;
+  --bg-tertiary: #262626;
+  --bg-input: #1e1e1e;
+  --bg-hover: rgba(255, 255, 255, 0.08);
+  --bg-hover-strong: rgba(255, 255, 255, 0.12);
+  --bg-dropdown: #242424;
+
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-hover: #ffffff;
+
+  --border-color: rgba(255, 255, 255, 0.1);
+  --logo-bg: #ffffff;
+
+  /* Accent Color (Friendly Purple) */
+  --accent-color: #8b5cf6;
+  --accent-hover: #7c3aed;
+  
+  /* Global Constants */
+  --border-radius: 12px;
+  --transition: all 0.2s ease;
+}
+
+[data-theme="light"] {
+  /* Light Mode */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --bg-input: #f9fafb;
+  --bg-hover: rgba(0, 0, 0, 0.05);
+  --bg-hover-strong: rgba(0, 0, 0, 0.08);
+  --bg-dropdown: #ffffff;
+
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-hover: #000000;
+
+  --border-color: rgba(0, 0, 0, 0.1);
+  --logo-bg: transparent;
+
+  /* Accent Color (Friendly Purple) */
+  --accent-color: #8b5cf6;
+  --accent-hover: #7c3aed;
+}
