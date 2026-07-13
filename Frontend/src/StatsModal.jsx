@@ -16,7 +16,7 @@ function StatsModal({ isOpen, onClose }) {
     const fetchStats = async () => {
         setLoading(true);
         try {
-            const res = await fetch("http://localhost:8080/api/stats", {
+            const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}` + "/api/stats", {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             if (res.status === 401) {

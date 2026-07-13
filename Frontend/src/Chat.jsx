@@ -70,7 +70,7 @@ function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, stre
         setPrevChats(prev => prev.map((msg, i) => i === idx ? { ...msg, reaction: newReaction } : msg));
 
         try {
-            const response = await fetch(`http://localhost:8080/api/chat/${currThreadId}/message/${idx}/reaction`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/chat/${currThreadId}/message/${idx}/reaction`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -92,7 +92,7 @@ function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, stre
         setPrevChats(prev => prev.map((msg, i) => i === idx ? { ...msg, isBookmarked: newStatus } : msg));
 
         try {
-            const response = await fetch(`http://localhost:8080/api/chat/${currThreadId}/message/${idx}/bookmark`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/chat/${currThreadId}/message/${idx}/bookmark`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

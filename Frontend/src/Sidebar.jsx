@@ -29,7 +29,7 @@ function Sidebar() {
 
     const getAllThreads = async () => {
         try {
-            const response = await fetch("http://localhost:8080/api/thread", { headers: authHeaders });
+            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}` + "/api/thread", { headers: authHeaders });
             if (response.status === 401) { handleLogout(); return; }
             const res = await response.json();
             const filteredData = res.map(thread => ({
@@ -46,7 +46,7 @@ function Sidebar() {
 
     const getAllFolders = async () => {
         try {
-            const response = await fetch("http://localhost:8080/api/folder", { headers: authHeaders });
+            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}` + "/api/folder", { headers: authHeaders });
             if (response.ok) {
                 setFolders(await response.json());
             }
@@ -88,7 +88,7 @@ function Sidebar() {
         setIsSearching(true);
         const timeoutId = setTimeout(async () => {
             try {
-                const response = await fetch(`http://localhost:8080/api/chat/search?q=${encodeURIComponent(searchQuery)}`, { headers: authHeaders });
+                const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/chat/search?q=${encodeURIComponent(searchQuery)}`, { headers: authHeaders });
                 if (response.status === 401) { handleLogout(); return; }
                 if (response.ok) {
                     const data = await response.json();
@@ -119,7 +119,7 @@ function Sidebar() {
     const changeThread = async (newThreadId) => {
         setCurrThreadId(newThreadId);
         try {
-            const response = await fetch(`http://localhost:8080/api/thread/${newThreadId}`, { headers: authHeaders });
+            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/thread/${newThreadId}`, { headers: authHeaders });
             if (response.status === 401) { handleLogout(); return; }
             const res = await response.json();
             setPrevChats(res.messages || []);
@@ -133,7 +133,7 @@ function Sidebar() {
 
     const deleteThread = async (threadId) => {
         try {
-            await fetch(`http://localhost:8080/api/thread/${threadId}`, { method: "DELETE", headers: authHeaders });
+            await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/thread/${threadId}`, { method: "DELETE", headers: authHeaders });
             setAllThreads(prev => prev.filter(thread => thread.threadId !== threadId));
             if (threadId === currThreadId) createNewChat();
         } catch(err) {
@@ -151,7 +151,7 @@ function Sidebar() {
     const submitRename = async (threadId) => {
         if (!renameValue.trim()) { setRenamingId(null); return; }
         try {
-            const response = await fetch(`http://localhost:8080/api/thread/${threadId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/thread/${threadId}`, {
                 method: "PATCH",
                 headers: authHeaders,
                 body: JSON.stringify({ title: renameValue.trim() })
@@ -170,7 +170,7 @@ function Sidebar() {
 
     const togglePin = async (threadId) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/thread/${threadId}/pin`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/thread/${threadId}/pin`, {
                 method: "PATCH",
                 headers: authHeaders
             });
@@ -188,7 +188,7 @@ function Sidebar() {
     const createFolder = async () => {
         if (!newFolderTitle.trim()) { setIsCreatingFolder(false); return; }
         try {
-            const response = await fetch("http://localhost:8080/api/folder", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}` + "/api/folder", {
                 method: "POST",
                 headers: authHeaders,
                 body: JSON.stringify({ name: newFolderTitle.trim() })
@@ -205,7 +205,7 @@ function Sidebar() {
     const renameFolder = async (folderId) => {
         if (!renameValue.trim()) { setRenamingFolderId(null); return; }
         try {
-            const response = await fetch(`http://localhost:8080/api/folder/${folderId}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/folder/${folderId}`, {
                 method: "PATCH",
                 headers: authHeaders,
                 body: JSON.stringify({ name: renameValue.trim() })
@@ -220,7 +220,7 @@ function Sidebar() {
     const deleteFolder = async (folderId) => {
         if (!window.confirm("Are you sure you want to delete this folder? (Chats will be moved to Uncategorized)")) return;
         try {
-            await fetch(`http://localhost:8080/api/folder/${folderId}`, { method: "DELETE", headers: authHeaders });
+            await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/folder/${folderId}`, { method: "DELETE", headers: authHeaders });
             setFolders(prev => prev.filter(f => f._id !== folderId));
             setAllThreads(prev => prev.map(t => t.folderId === folderId ? {...t, folderId: null} : t));
         } catch(err) { console.log(err); }
@@ -228,7 +228,7 @@ function Sidebar() {
 
     const moveToFolder = async (threadId, folderId) => {
         try {
-            await fetch(`http://localhost:8080/api/thread/${threadId}/folder`, {
+            await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/thread/${threadId}/folder`, {
                 method: "PATCH",
                 headers: authHeaders,
                 body: JSON.stringify({ folderId })

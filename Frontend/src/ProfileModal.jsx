@@ -37,7 +37,7 @@ function ProfileModal({ onClose }) {
         setError("");
 
         try {
-            const response = await fetch("http://localhost:8080/api/auth/profile", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}` + "/api/auth/profile", {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

@@ -299,13 +299,13 @@ function ChatWindow({ setShowShortcuts }) {
                 formData.append("threadId", currThreadId);
                 formData.append("language", language);
 
-                response = await fetch("http://localhost:8080/api/upload", {
+                response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}` + "/api/upload", {
                     method: "POST",
                     headers: { "Authorization": `Bearer ${token}` },
                     body: formData
                 });
             } else {
-                response = await fetch("http://localhost:8080/api/chat", {
+                response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}` + "/api/chat", {
                     method: "POST",
                     headers: authHeaders,
                     body: JSON.stringify({ message: userMessage, threadId: currThreadId, language, persona, model })
@@ -359,7 +359,7 @@ function ChatWindow({ setShowShortcuts }) {
         setPrevChats(prev => [...prev.slice(0, messageIndex), userEntry]);
 
         try {
-            const response = await fetch("http://localhost:8080/api/chat/edit", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}` + "/api/chat/edit", {
                 method: "PUT",
                 headers: authHeaders,
                 body: JSON.stringify({ message: newText, threadId: currThreadId, messageIndex, language, persona, model })
@@ -405,7 +405,7 @@ function ChatWindow({ setShowShortcuts }) {
         setPrevChats(prev => prev.slice(0, aiMessageIndex));
 
         try {
-            const response = await fetch("http://localhost:8080/api/chat/regenerate", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}` + "/api/chat/regenerate", {
                 method: "POST",
                 headers: authHeaders,
                 body: JSON.stringify({ threadId: currThreadId, aiMessageIndex, language, persona, model })
@@ -492,7 +492,7 @@ function ChatWindow({ setShowShortcuts }) {
     const handleShare = async () => {
         if (!prevChats || prevChats.length === 0) return;
         try {
-            const response = await fetch(`http://localhost:8080/api/chat/${currThreadId}/share`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/chat/${currThreadId}/share`, {
                 method: "POST",
                 headers: authHeaders
             });
@@ -508,7 +508,7 @@ function ChatWindow({ setShowShortcuts }) {
 
     const handleUnshare = async () => {
         try {
-            await fetch(`http://localhost:8080/api/chat/${currThreadId}/unshare`, {
+            await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/chat/${currThreadId}/unshare`, {
                 method: "POST",
                 headers: authHeaders
             });

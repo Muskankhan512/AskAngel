@@ -25,7 +25,7 @@ function SharedChatView({ shareId }) {
     useEffect(() => {
         const fetchSharedChat = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/api/chat/shared/${shareId}`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/chat/shared/${shareId}`);
                 if (!response.ok) {
                     const data = await response.json();
                     throw new Error(data.error || "Failed to load shared chat");
