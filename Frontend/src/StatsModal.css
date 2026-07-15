@@ -110,3 +110,9 @@
     color: var(--text-secondary);
     margin-top: 5px;
 }
+
+@media (max-width: 480px) {
+    .statsGrid {
+        grid-template-columns: 1fr;
+    }
+}

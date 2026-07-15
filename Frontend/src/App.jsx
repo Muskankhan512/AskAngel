@@ -6,6 +6,7 @@ import Signup from "./Signup.jsx";
 import { MyContext } from "./MyContext.jsx";
 import ShortcutsModal from "./ShortcutsModal.jsx";
 import SharedChatView from "./SharedChatView.jsx";
+import { ToastProvider } from "./ToastContext";
 import { useState, useEffect } from 'react';
 import {v1 as uuidv1} from "uuid";
 
@@ -37,6 +38,7 @@ function App() {
 
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(localStorage.getItem("soundEnabled") !== "false");
+  const [isSidebarOpenMobile, setIsSidebarOpenMobile] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -161,7 +163,8 @@ function App() {
     persona, setPersona,
     model, setModel,
     messageCountToday, setMessageCountToday,
-    soundEnabled, setSoundEnabled
+    soundEnabled, setSoundEnabled,
+    isSidebarOpenMobile, setIsSidebarOpenMobile
   };
 
   return (

@@ -23,6 +23,23 @@ const tools = [
                 required: ["query"]
             }
         }
+    },
+    {
+        type: "function",
+        function: {
+            name: "generate_image",
+            description: "Generate an AI image based on a prompt. Call this tool WHENEVER the user asks to generate, create, draw, or make an image, picture, or photo.",
+            parameters: {
+                type: "object",
+                properties: {
+                    prompt: {
+                        type: "string",
+                        description: "A detailed description of the image to generate."
+                    }
+                },
+                required: ["prompt"]
+            }
+        }
     }
 ];
 
@@ -67,14 +84,23 @@ export const groqChatStream = async (messageHistory, persona, language, res, mod
 
     const personaMap = {
         "Default Assistant": "You are a helpful, respectful, and honest AI assistant.",
-        "Coding Assistant": "You are an expert programmer. Give clear, concise code explanations and working code examples.",
+        "Coding Assistant": "You are an expert programmer. Give clear, concise code explanations and working code examples. Always wrap code in fenced code blocks with the correct language specified (e.g. ```python, ```javascript).",
         "Friendly Tutor": "You are a patient, encouraging tutor who explains concepts simply with examples, as if teaching a student.",
         "Motivational Coach": "You are an energetic motivational coach who gives encouraging, actionable advice.",
         "Doctor Advisor": "You are a knowledgeable health information assistant. Provide general health information but always remind the user to consult a real doctor for diagnosis or treatment."
     };
 
+    const markdownInstructions = `\nFORMATTING RULES — ALWAYS FOLLOW THESE:
+- Use proper markdown formatting in all responses.
+- Use ## or ### headings to structure long answers (not for simple one-liners).
+- Use bullet points (- item) or numbered lists (1. item) whenever you list multiple things.
+- Bold (**text**) important terms or key concepts.
+- Use fenced code blocks with a language tag (e.g. \`\`\`python) for ANY code snippet, even short ones.
+- For comparisons, use a markdown table.
+- Keep paragraphs concise. Avoid walls of text.`;
+
     const targetPersona = personaMap[persona] || personaMap["Default Assistant"];
-    const systemPrompt = `${targetPersona}\nAlways respond in ${targetLang}, regardless of what language the user writes in.\nIMPORTANT INSTRUCTION FOR TOOL USAGE: ONLY use the web_search tool if the user explicitly asks a question requiring real-time information or facts you do not know. DO NOT use the web_search tool for casual conversational messages, greetings like "hello", "hi", or generic statements.`;
+    const systemPrompt = `${targetPersona}${markdownInstructions}\nAlways respond in ${targetLang}, regardless of what language the user writes in.\nIMPORTANT INSTRUCTION FOR TOOL USAGE:\n1. ONLY use the web_search tool if the user explicitly asks a question requiring real-time information or facts you do not know. DO NOT use the web_search tool for casual conversational messages, greetings like "hello", "hi", or generic statements.\n2. If the user asks to generate, draw, or create an image/picture, you MUST use the generate_image tool. Do not say you cannot generate images.`;
 
     const formattedMessages = [
         { role: "system", content: systemPrompt },
@@ -158,35 +184,44 @@ export const groqChatStream = async (messageHistory, persona, language, res, mod
 
             // Execute all tool calls concurrently
             const toolExecutions = toolCallsList.map(async (tc) => {
+                let args = {};
+                try {
+                    args = JSON.parse(tc.function.arguments || "{}");
+                } catch (parseErr) {
+                    console.error("JSON parse error for tool arguments:", tc.function.arguments);
+                }
+
                 if (tc.function.name === "web_search") {
-                    let args = {};
-                    try {
-                        args = JSON.parse(tc.function.arguments || "{}");
-                    } catch (parseErr) {
-                        console.error("JSON parse error for tool arguments:", tc.function.arguments);
-                    }
-                    
                     const query = args.query;
-                    
                     if (query) {
                         res.write(`data: ${JSON.stringify({ type: "search_started", query })}\n\n`);
                         const results = await executeWebSearch(query);
-                        return { id: tc.id, query, results };
+                        return { id: tc.id, query, results, toolName: "web_search" };
                     }
+                } else if (tc.function.name === "generate_image") {
+                    const imgPrompt = args.prompt || "image";
+                    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imgPrompt)}?width=1024&height=1024&nologo=true`;
+                    const md = `![${imgPrompt}](${imageUrl})`;
+                    return { id: tc.id, query: imgPrompt, results: [{ content: md }], toolName: "generate_image" };
                 }
-                return { id: tc.id, query: null, results: [] };
+                return { id: tc.id, query: null, results: [], toolName: tc.function.name };
             });
 
             const resolvedTools = await Promise.all(toolExecutions);
 
             for (const resolved of resolvedTools) {
                 const results = resolved.results;
-                if (resolved.query) combinedQuery += (combinedQuery ? ", " : "") + resolved.query;
-                combinedSources.push(...results);
-
-                const toolResultText = results.length > 0 
-                    ? results.map(r => `Title: ${r.title}\nURL: ${r.url}\nContent: ${r.content}`).join('\n\n')
-                    : "No relevant information found.";
+                
+                let toolResultText = "";
+                if (resolved.toolName === "web_search") {
+                    if (resolved.query) combinedQuery += (combinedQuery ? ", " : "") + resolved.query;
+                    combinedSources.push(...results);
+                    toolResultText = results.length > 0 
+                        ? results.map(r => `Title: ${r.title}\nURL: ${r.url}\nContent: ${r.content}`).join('\n\n')
+                        : "No relevant information found.";
+                } else if (resolved.toolName === "generate_image") {
+                    toolResultText = `SUCCESS. The image has been generated. You MUST reply to the user with EXACTLY this markdown string to display it, and do not say you cannot generate images:\n\n${results[0].content}`;
+                }
 
                 combinedResultsText += toolResultText + "\n\n";
 
@@ -197,8 +232,10 @@ export const groqChatStream = async (messageHistory, persona, language, res, mod
                 });
             }
 
-            searchMetadata = { query: combinedQuery, sources: combinedSources };
-            res.write(`data: ${JSON.stringify({ type: "search_completed", sources: combinedSources })}\n\n`);
+            if (combinedSources.length > 0) {
+                searchMetadata = { query: combinedQuery, sources: combinedSources };
+                res.write(`data: ${JSON.stringify({ type: "search_completed", sources: combinedSources })}\n\n`);
+            }
 
             // Start 2nd Stream
             const stream2 = await openai.chat.completions.create({

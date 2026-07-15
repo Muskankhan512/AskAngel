@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import './StatsModal.css';
 import { MyContext } from './MyContext.jsx';
+import Spinner from './Spinner.jsx';
 
 function StatsModal({ isOpen, onClose }) {
     const [stats, setStats] = useState(null);
@@ -52,7 +53,15 @@ function StatsModal({ isOpen, onClose }) {
                 </div>
                 
                 {loading || !stats ? (
-                    <p style={{textAlign: 'center', color: 'var(--text-secondary)'}}>Loading stats...</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', padding: '40px 0' }}>
+                        <Spinner size="large" />
+                        <p style={{ color: 'var(--text-secondary)' }}>Loading stats...</p>
+                    </div>
+                ) : stats.totalMessages === 0 ? (
+                    <div className="emptyState" style={{ padding: '40px 0' }}>
+                        <i className="fa-solid fa-chart-simple"></i>
+                        <p>Start chatting to see your stats here!</p>
+                    </div>
                 ) : (
                     <>
                         <div className="statsGrid">

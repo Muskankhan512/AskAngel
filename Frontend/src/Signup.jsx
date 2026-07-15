@@ -1,16 +1,17 @@
 import { useState } from "react";
+import { useToast } from "./ToastContext";
+import Spinner from "./Spinner";
 import "./Auth.css";
 
 function Signup({ onSwitch, onLogin }) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const { showToast } = useToast();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError("");
         setLoading(true);
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}` + "/api/auth/signup", {
@@ -19,12 +20,15 @@ function Signup({ onSwitch, onLogin }) {
                 body: JSON.stringify({ name, email, password })
             });
             const data = await res.json();
-            if (!res.ok) { setError(data.error); return; }
+            if (!res.ok) { 
+                showToast(data.error || "An account with this email already exists. Try logging in instead.", "error"); 
+                return; 
+            }
             localStorage.setItem("token", data.token);
             localStorage.setItem("user", JSON.stringify(data.user));
             onLogin(data.user);
         } catch (err) {
-            setError("Network error. Is the backend running?");
+            showToast("Something went wrong. Please try again in a moment.", "error");
         } finally {
             setLoading(false);
         }
@@ -38,8 +42,6 @@ function Signup({ onSwitch, onLogin }) {
                 </div>
                 <h1 className="authTitle">Create account</h1>
                 <p className="authSubtitle">Join AskAngel and start chatting</p>
-
-                {error && <div className="authError"><i className="fa-solid fa-circle-exclamation"></i> {error}</div>}
 
                 <form onSubmit={handleSubmit} className="authForm">
                     <div className="authField">
@@ -73,7 +75,7 @@ function Signup({ onSwitch, onLogin }) {
                         />
                     </div>
                     <button type="submit" className="authBtn" disabled={loading}>
-                        {loading ? <><i className="fa-solid fa-spinner fa-spin"></i> Creating account...</> : "Create Account"}
+                        {loading ? <><Spinner size="small" /> Creating account...</> : "Create Account"}
                     </button>
                 </form>
 

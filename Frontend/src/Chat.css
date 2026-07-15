@@ -8,8 +8,10 @@
 
 .userDiv {
     display: flex;
-    justify-content: flex-end;
+    flex-direction: column;
+    align-items: flex-end;
     font-size: 0.9rem;
+    margin-bottom: 20px;
 }
 
 
@@ -18,21 +20,125 @@
     font-size: 0.9rem;
 }
 
+.userMessageWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 85%;
+}
+
 .userMessage {
-    background-color: var(--bg-tertiary);
-    padding: 10px 20px;
-    border-radius: 14px;
-    margin-left: 15rem;
-    max-width: 500px;
+    background-color: var(--accent-color);
+    color: #ffffff;
+    padding: 10px 16px;
+    border-radius: 18px;
+    border-bottom-right-radius: 4px;
+    margin: 0;
     width: fit-content;
+    word-wrap: break-word;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .hljs {
-    border-radius: 14px !important;
+    border-radius: 10px !important;
+    font-size: 0.85rem !important;
 }
 
 pre {
     white-space: pre-wrap;
+    margin: 12px 0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* ── Markdown content inside AI responses ── */
+.gptResponse h1, .gptResponse h2, .gptResponse h3,
+.gptResponse h4, .gptResponse h5, .gptResponse h6 {
+    color: var(--text-primary);
+    font-weight: 700;
+    margin: 20px 0 8px 0;
+    line-height: 1.3;
+}
+
+.gptResponse h1 { font-size: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; }
+.gptResponse h2 { font-size: 1.25rem; }
+.gptResponse h3 { font-size: 1.1rem; }
+
+.gptResponse p {
+    margin: 6px 0;
+    line-height: 1.7;
+}
+
+.gptResponse ul, .gptResponse ol {
+    margin: 8px 0 8px 20px;
+    padding: 0;
+    line-height: 1.7;
+}
+
+.gptResponse li {
+    margin-bottom: 4px;
+}
+
+.gptResponse ul li::marker {
+    color: var(--accent-color);
+}
+
+.gptResponse strong {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.gptResponse em {
+    color: var(--text-secondary);
+}
+
+.gptResponse code:not(pre code) {
+    background-color: rgba(139, 92, 246, 0.12);
+    color: #c4b5fd;
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 0.85em;
+    font-family: 'Fira Code', 'Consolas', monospace;
+}
+
+.gptResponse table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 12px 0;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.gptResponse th {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-weight: 600;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.gptResponse td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.gptResponse tr:last-child td {
+    border-bottom: none;
+}
+
+.gptResponse blockquote {
+    border-left: 3px solid var(--accent-color);
+    padding: 8px 16px;
+    margin: 12px 0;
+    background-color: rgba(139, 92, 246, 0.06);
+    border-radius: 0 8px 8px 0;
+    color: var(--text-secondary);
+    font-style: italic;
 }
 
 /* AI response wrapper with copy button */
@@ -47,13 +153,14 @@ pre {
     background: transparent;
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    padding: 4px 8px;
+    padding: 6px 10px;
     cursor: pointer;
     font-size: 0.75rem;
     opacity: 0;
     margin-top: 4px;
-    transition: var(--transition);
+    transition: all 0.15s ease;
     color: var(--text-secondary);
+    transform: translateY(0);
 }
 
 .copyBtn i, .regenerateBtn i, .reactionBtn i {
@@ -70,7 +177,10 @@ pre {
 }
 
 .copyBtn:hover, .regenerateBtn:hover, .reactionBtn:hover {
-    background-color: var(--bg-hover);
+    background-color: var(--bg-hover-strong);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+    border-color: var(--accent-color);
 }
 
 /* checkmark turns green */
@@ -166,8 +276,15 @@ pre {
     color: var(--text-secondary);
     cursor: pointer;
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: all 0.15s ease;
     font-size: 0.9rem;
+    padding: 4px 6px;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .userMessageWrapper:hover .editMsgBtn {
@@ -176,6 +293,7 @@ pre {
 
 .editMsgBtn:hover {
     color: var(--text-primary);
+    background-color: var(--bg-hover-strong);
 }
 
 .editMessageContainer {
@@ -296,14 +414,14 @@ pre {
     flex-direction: column;
     gap: 12px;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.2s ease;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .suggestionCard:hover {
     background: var(--bg-hover-strong);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 16px 32px rgba(0,0,0,0.15);
     border-color: var(--accent-color);
 }
 
@@ -379,4 +497,121 @@ pre {
     background-color: var(--bg-hover, #333);
     color: #60a5fa;
     border-color: #60a5fa;
+}
+
+/* ── Mobile Responsive Styles ── */
+@media (max-width: 768px) {
+    .chats {
+        padding: 1rem 0.5rem;
+    }
+
+    .userMessageWrapper {
+        max-width: 100%;
+    }
+    
+    .userMessage {
+        margin-left: 0;
+        max-width: 100%;
+    }
+
+    .suggestionsGrid {
+        grid-template-columns: 1fr; /* Stack into a single column */
+        padding: 0 10px;
+    }
+
+    .copyBtn, .regenerateBtn, .reactionBtn {
+        padding: 8px 12px; /* Increase touch target size */
+        margin-top: 8px;
+    }
+
+    .gptMeta {
+        flex-wrap: wrap; /* allow buttons to wrap if needed */
+    }
+
+    .newChatScreen h1 {
+        font-size: 1.8rem;
+    }
+
+    .welcomeIcon {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
+    }
+}
+
+/* ── Generated Image Styles ── */
+.generated-image-container {
+    position: relative;
+    max-width: 400px;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    background-color: var(--bg-tertiary);
+}
+
+.generated-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+    transition: opacity 0.3s ease;
+}
+
+.generated-image.hidden {
+    opacity: 0;
+}
+
+.generated-image-skeleton {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--border-radius);
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.download-img-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: background-color 0.2s;
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+.download-img-btn:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    opacity: 1;
+}
+
+.generated-image-error {
+    max-width: 400px;
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
 }

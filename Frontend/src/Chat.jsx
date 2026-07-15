@@ -3,6 +3,7 @@ import React, { useContext, useState, useEffect, useRef } from "react";
 import { MyContext } from "./MyContext";
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
+import remarkGfm from "remark-gfm";
 import "highlight.js/styles/github-dark.css";
 import { translations } from "./translations.js";
 
@@ -51,12 +52,119 @@ function TypingIndicator({ persona }) {
     );
 }
 
+// ── Custom Image Component for Generated Images ──
+const CustomImage = ({ node, src, alt, ...props }) => {
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+
+    const handleDownload = async () => {
+        try {
+            const response = await fetch(src);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${alt || 'generated-image'}.jpg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error("Download failed", err);
+            const a = document.createElement('a');
+            a.href = src;
+            a.download = `${alt || 'generated-image'}.jpg`;
+            a.target = '_blank';
+            a.click();
+        }
+    };
+
+    if (error) {
+        return (
+            <div className="generated-image-error">
+                <i className="fa-solid fa-triangle-exclamation"></i>
+                <p>Image could not be generated. Please try again.</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="generated-image-container">
+            {loading && <div className="generated-image-skeleton"></div>}
+            <img 
+                src={src} 
+                alt={alt} 
+                {...props} 
+                onLoad={() => setLoading(false)}
+                onError={() => { setLoading(false); setError(true); }}
+                className={`generated-image ${loading ? 'hidden' : ''}`}
+            />
+            {!loading && (
+                <button className="download-img-btn" onClick={handleDownload} title="Download Image">
+                    <i className="fa-solid fa-download"></i>
+                </button>
+            )}
+        </div>
+    );
+};
+
 function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, streamingSearchMetadata }) {
     const { newChat, prevChats, setPrevChats, loading, streamingText, isStreaming, language, currThreadId, token, handleLogout, persona } = useContext(MyContext);
     const t = translations[language];
     const [editingIndex, setEditingIndex] = useState(null);
     const [editValue, setEditValue] = useState("");
     const bottomRef = useRef(null);
+    const [speakingIdx, setSpeakingIdx] = useState(null);
+
+    // Strip markdown for TTS reading
+    const stripMarkdown = (text) => {
+        return text
+            .replace(/```[\s\S]*?```/g, 'code block')  // code blocks
+            .replace(/`([^`]+)`/g, '$1')               // inline code
+            .replace(/#{1,6}\s/g, '')                  // headings
+            .replace(/\*\*([^*]+)\*\*/g, '$1')         // bold
+            .replace(/\*([^*]+)\*/g, '$1')             // italic
+            .replace(/~~([^~]+)~~/g, '$1')             // strikethrough
+            .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')  // links
+            .replace(/^[-*+]\s/gm, '')                 // unordered list items
+            .replace(/^\d+\.\s/gm, '')                 // ordered list items
+            .replace(/^>\s/gm, '')                     // blockquotes
+            .replace(/\|/g, ' ')                       // table pipes
+            .trim();
+    };
+
+    const speakText = (text, idx) => {
+        if (!window.speechSynthesis) return;
+
+        // If already speaking this message, stop it
+        if (speakingIdx === idx) {
+            window.speechSynthesis.cancel();
+            setSpeakingIdx(null);
+            return;
+        }
+
+        // Stop any other speaking
+        window.speechSynthesis.cancel();
+
+        const cleaned = stripMarkdown(text);
+        const utterance = new SpeechSynthesisUtterance(cleaned);
+        utterance.rate = 0.95;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+
+        // Pick a natural-sounding voice if available
+        const voices = window.speechSynthesis.getVoices();
+        const preferred = voices.find(v => v.lang === 'en-US' && v.name.includes('Natural'))
+            || voices.find(v => v.lang === 'en-US')
+            || voices[0];
+        if (preferred) utterance.voice = preferred;
+
+        utterance.onend = () => setSpeakingIdx(null);
+        utterance.onerror = () => setSpeakingIdx(null);
+
+        setSpeakingIdx(idx);
+        window.speechSynthesis.speak(utterance);
+    };
 
     // Auto-scroll whenever content changes
     useEffect(() => {
@@ -195,7 +303,13 @@ function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, stre
                                         <i className="fa-solid fa-magnifying-glass"></i> Searched the web for "{chat.searchQuery}"
                                     </div>
                                 )}
-                                <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{chat.content}</ReactMarkdown>
+                                <ReactMarkdown 
+                                    rehypePlugins={[rehypeHighlight]}
+                                    remarkPlugins={[remarkGfm]}
+                                    components={{ img: CustomImage }}
+                                >
+                                    {chat.content}
+                                </ReactMarkdown>
                                 
                                 {chat.searchSources && chat.searchSources.length > 0 && (
                                     <div className="searchSources">
@@ -212,6 +326,13 @@ function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, stre
                                 <div className="gptMeta">
                                     <span className="timestamp">{formatTime(chat.timestamp)}</span>
                                     <CopyButton text={chat.content} />
+                                    <button
+                                        className={`reactionBtn ${speakingIdx === idx ? 'activeLike' : ''}`}
+                                        onClick={() => speakText(chat.content, idx)}
+                                        title={speakingIdx === idx ? 'Stop speaking' : 'Read aloud'}
+                                    >
+                                        <i className={`fa-solid ${speakingIdx === idx ? 'fa-volume-xmark' : 'fa-volume-high'}`}></i>
+                                    </button>
                                     <button 
                                         className={`reactionBtn ${chat.reaction === 'like' ? 'activeLike' : ''}`}
                                         onClick={() => handleReaction(idx, 'like')}

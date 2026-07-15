@@ -1,5 +1,6 @@
 import { useState, useContext, useRef } from "react";
 import { MyContext } from "./MyContext.jsx";
+import { useToast } from "./ToastContext";
 import "./ProfileModal.css";
 
 function ProfileModal({ onClose }) {
@@ -7,14 +8,14 @@ function ProfileModal({ onClose }) {
     const [name, setName] = useState(user?.name || "");
     const [avatarPreview, setAvatarPreview] = useState(user?.avatar || "");
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
     const fileInputRef = useRef(null);
+    const { showToast } = useToast();
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
         if (!file.type.startsWith("image/")) {
-            setError("Please upload a valid image file.");
+            showToast("Please upload a valid image file.", "error");
             return;
         }
         
@@ -22,19 +23,17 @@ function ProfileModal({ onClose }) {
         const reader = new FileReader();
         reader.onloadend = () => {
             setAvatarPreview(reader.result);
-            setError("");
         };
         reader.readAsDataURL(file);
     };
 
     const handleSave = async () => {
         if (!name.trim()) {
-            setError("Name cannot be empty.");
+            showToast("Name cannot be empty.", "error");
             return;
         }
 
         setLoading(true);
-        setError("");
 
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}` + "/api/auth/profile", {
@@ -56,12 +55,13 @@ function ProfileModal({ onClose }) {
                 setUser(data.user);
                 localStorage.setItem("user", JSON.stringify(data.user));
                 onClose();
+                showToast("Profile updated successfully", "success");
             } else {
-                setError(data.error || "Failed to update profile.");
+                showToast(data.error || "Failed to update profile.", "error");
             }
         } catch (err) {
             console.error(err);
-            setError("Network error. Please try again.");
+            showToast("Network error. Please try again.", "error");
         } finally {
             setLoading(false);
         }
@@ -76,8 +76,6 @@ function ProfileModal({ onClose }) {
                 </div>
                 
                 <div className="profileModalBody">
-                    {error && <div className="profileError">{error}</div>}
-                    
                     <div className="avatarSection">
                         <div className="avatarPreviewWrapper">
                             {avatarPreview ? (

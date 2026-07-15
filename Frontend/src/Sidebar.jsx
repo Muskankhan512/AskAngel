@@ -1,12 +1,14 @@
 import "./Sidebar.css";
 import { useContext, useEffect, useState } from "react";
 import { MyContext } from "./MyContext.jsx";
+import { useToast } from "./ToastContext";
 import {v1 as uuidv1} from "uuid";
 import { translations } from "./translations.js";
 
 function Sidebar() {
     const {allThreads, setAllThreads, currThreadId, setNewChat, setPrompt, setReply,
-           setCurrThreadId, setPrevChats, token, handleLogout, language, setPersona, prompt} = useContext(MyContext);
+           setCurrThreadId, setPrevChats, token, handleLogout, language, setPersona, prompt,
+           isSidebarOpenMobile, setIsSidebarOpenMobile} = useContext(MyContext);
     const [menuOpenId, setMenuOpenId] = useState(null);
     const [renamingId, setRenamingId] = useState(null);
     const [renameValue, setRenameValue] = useState("");
@@ -20,6 +22,7 @@ function Sidebar() {
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+    const { showToast } = useToast();
     const t = translations[language];
 
     const authHeaders = {
@@ -40,7 +43,7 @@ function Sidebar() {
             }));
             setAllThreads(filteredData);
         } catch(err) {
-            console.log(err);
+            console.error(err);
         }
     };
 
@@ -137,7 +140,8 @@ function Sidebar() {
             setAllThreads(prev => prev.filter(thread => thread.threadId !== threadId));
             if (threadId === currThreadId) createNewChat();
         } catch(err) {
-            console.log(err);
+            console.error(err);
+            showToast("Failed to delete chat", "error");
         }
         setConfirmDeleteId(null);
     };
@@ -196,8 +200,13 @@ function Sidebar() {
             if (response.ok) {
                 const newFolder = await response.json();
                 setFolders(prev => [...prev, newFolder]);
+            } else {
+                showToast("Failed to create folder", "error");
             }
-        } catch(err) { console.log(err); }
+        } catch(err) { 
+            console.error(err); 
+            showToast("Network error", "error");
+        }
         setNewFolderTitle("");
         setIsCreatingFolder(false);
     };
@@ -212,8 +221,13 @@ function Sidebar() {
             });
             if (response.ok) {
                 setFolders(prev => prev.map(f => f._id === folderId ? {...f, name: renameValue.trim()} : f));
+            } else {
+                showToast("Failed to rename folder", "error");
             }
-        } catch(err) { console.log(err); }
+        } catch(err) { 
+            console.error(err); 
+            showToast("Network error", "error");
+        }
         setRenamingFolderId(null);
     };
 
@@ -223,7 +237,10 @@ function Sidebar() {
             await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/folder/${folderId}`, { method: "DELETE", headers: authHeaders });
             setFolders(prev => prev.filter(f => f._id !== folderId));
             setAllThreads(prev => prev.map(t => t.folderId === folderId ? {...t, folderId: null} : t));
-        } catch(err) { console.log(err); }
+        } catch(err) { 
+            console.error(err); 
+            showToast("Failed to delete folder", "error");
+        }
     };
 
     const moveToFolder = async (threadId, folderId) => {
@@ -239,7 +256,18 @@ function Sidebar() {
     };
 
     const renderThreadList = (threads, title) => {
-        if (!threads || threads.length === 0) return null;
+        if (!threads || threads.length === 0) {
+            if (title === null) {
+                // This is a folder list
+                return (
+                    <div className="emptyState" style={{ padding: '12px 16px' }}>
+                        <i className="fa-regular fa-folder-open"></i>
+                        <p>This folder is empty. Move a chat here to organize it.</p>
+                    </div>
+                );
+            }
+            return null;
+        }
         return (
             <div className="threadSection">
                 <p className="sectionTitle">{title}</p>
@@ -323,8 +351,18 @@ function Sidebar() {
     const uncategorizedThreads = unpinnedThreads.filter(t => !t.folderId);
 
     return (
-        <section className="sidebar">
-            <button onClick={createNewChat}>
+        <>
+        {isSidebarOpenMobile && (
+            <div className="sidebar-backdrop" onClick={() => setIsSidebarOpenMobile(false)}></div>
+        )}
+        <section className={`sidebar ${isSidebarOpenMobile ? 'mobile-open' : ''}`}>
+            <div className="sidebar-header-mobile">
+                <div className="mobileTitle">AskAngel</div>
+                <button className="sidebar-close-btn" onClick={() => setIsSidebarOpenMobile(false)}>
+                    <i className="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <button className="newChatBtn" onClick={createNewChat}>
                 <img src="src/assets/blacklogo.png" alt="gpt logo" className="logo"></img>
                 <span><i className="fa-solid fa-pen-to-square"></i></span>
             </button>
@@ -349,7 +387,10 @@ function Sidebar() {
                     ) : searchResults.length > 0 ? (
                         renderThreadList(searchResults, "Search Results")
                     ) : (
-                        <div style={{padding: '15px', textAlign: 'center', color: 'var(--text-secondary)'}}>No chats found</div>
+                        <div className="emptyState" style={{ marginTop: '40px' }}>
+                            <i className="fa-solid fa-magnifying-glass"></i>
+                            <p>No chats found matching "{searchQuery}"</p>
+                        </div>
                     )
                 ) : (
                     <>
@@ -429,6 +470,7 @@ function Sidebar() {
                 )}
             </ul>
         </section>
+        </>
     );
 }
 

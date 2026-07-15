@@ -4,6 +4,7 @@ import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
 import './ChatWindow.css';
 import './Chat.css'; // Reuse existing chat styles
+import Spinner from './Spinner.jsx';
 
 // ── helper: format a Date or ISO string to "2:34 PM" ──
 function formatTime(ts) {
@@ -43,7 +44,8 @@ function SharedChatView({ shareId }) {
 
     if (loading) {
         return (
-            <div className="app" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw' }}>
+            <div className="app" style={{ display: 'flex', flexDirection: 'column', gap: '15px', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw' }}>
+                <Spinner size="large" />
                 <h2 style={{ color: 'var(--text-primary)' }}>Loading shared conversation...</h2>
             </div>
         );

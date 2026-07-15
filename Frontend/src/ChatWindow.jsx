@@ -8,6 +8,7 @@ import ShareModal from "./ShareModal.jsx";
 import ProfileModal from "./ProfileModal.jsx";
 import BookmarksModal from "./BookmarksModal.jsx";
 import StatsModal from "./StatsModal.jsx";
+import Spinner from "./Spinner.jsx";
 
 function ChatWindow({ setShowShortcuts }) {
     const {
@@ -18,7 +19,8 @@ function ChatWindow({ setShowShortcuts }) {
         persona, setPersona,
         model, setModel,
         messageCountToday, setMessageCountToday,
-        soundEnabled, setSoundEnabled
+        soundEnabled, setSoundEnabled,
+        isSidebarOpenMobile, setIsSidebarOpenMobile
     } = useContext(MyContext);
 
     const t = translations[language];
@@ -522,13 +524,22 @@ function ChatWindow({ setShowShortcuts }) {
     return (
         <div className="chatWindow">
             <div className="navbar">
-                <span className="navbarTitle">AskAngel <i className="fa-solid fa-chevron-down"></i></span>
+                <div style={{display: 'flex', alignItems: 'center'}}>
+                    <div 
+                        className="hamburgerBtn" 
+                        onClick={() => setIsSidebarOpenMobile(true)}
+                        title="Open Menu"
+                    >
+                        <i className="fa-solid fa-bars"></i>
+                    </div>
+                    <span className="navbarTitle">AskAngel <i className="fa-solid fa-chevron-down"></i></span>
+                </div>
                 <div className="navbarControls" ref={navRef}>
                     {user && <span className="navGreeting">Hi, {user.name}!</span>}
                     
                     {/* Bookmarks Toggle */}
                     <div
-                        className="navItem iconItem"
+                        className="navItem iconItem hide-on-mobile"
                         onClick={() => setIsBookmarksOpen(true)}
                         title="Bookmarks"
                     >
@@ -537,7 +548,7 @@ function ChatWindow({ setShowShortcuts }) {
                     
                     {/* Model Selector */}
                     <div
-                        className="navItem textItem"
+                        className="navItem textItem hide-on-mobile"
                         onClick={() => { setIsModelOpen(!isModelOpen); setIsPersonaOpen(false); setIsLangOpen(false); setIsOpen(false); setIsMoreMenuOpen(false); }}
                         title="Select Model"
                     >
@@ -569,7 +580,7 @@ function ChatWindow({ setShowShortcuts }) {
 
                     {/* Persona Selector */}
                     <div
-                        className="navItem textItem"
+                        className="navItem textItem hide-on-mobile"
                         onClick={() => { setIsPersonaOpen(!isPersonaOpen); setIsLangOpen(false); setIsOpen(false); setIsMoreMenuOpen(false); }}
                     >
                         {persona} <i className="fa-solid fa-caret-down" style={{fontSize: '0.8rem'}}></i>
@@ -595,7 +606,7 @@ function ChatWindow({ setShowShortcuts }) {
                     
                     {/* Language Selector */}
                     <div
-                        className="navItem textItem"
+                        className="navItem textItem hide-on-mobile"
                         onClick={() => { setIsLangOpen(!isLangOpen); setIsPersonaOpen(false); setIsOpen(false); setIsMoreMenuOpen(false); }}
                     >
                         {langOptions.find(l => l.code === language)?.label || 'Language'} <i className="fa-solid fa-caret-down" style={{fontSize: '0.8rem'}}></i>
@@ -643,6 +654,18 @@ function ChatWindow({ setShowShortcuts }) {
                         <i className="fa-solid fa-ellipsis-vertical"></i>
                         {isMoreMenuOpen && (
                             <div className="dropDown" style={{top: '45px', right: '0', minWidth: '180px'}}>
+                                <div className="dropDownItem show-on-mobile" onClick={(e) => { e.stopPropagation(); setIsBookmarksOpen(true); setIsMoreMenuOpen(false); }}>
+                                    <i className="fa-solid fa-bookmark menuIcon"></i> Bookmarks
+                                </div>
+                                <div className="dropDownItem show-on-mobile" onClick={(e) => { e.stopPropagation(); setIsModelOpen(true); setIsMoreMenuOpen(false); }}>
+                                    <i className="fa-solid fa-brain menuIcon"></i> Change Model
+                                </div>
+                                <div className="dropDownItem show-on-mobile" onClick={(e) => { e.stopPropagation(); setIsPersonaOpen(true); setIsMoreMenuOpen(false); }}>
+                                    <i className="fa-solid fa-user-astronaut menuIcon"></i> Change Persona
+                                </div>
+                                <div className="dropDownItem show-on-mobile" onClick={(e) => { e.stopPropagation(); setIsLangOpen(true); setIsMoreMenuOpen(false); }}>
+                                    <i className="fa-solid fa-language menuIcon"></i> Change Language
+                                </div>
                                 <div className="dropDownItem" onClick={(e) => { e.stopPropagation(); setSoundEnabled(!soundEnabled); setIsMoreMenuOpen(false); }}>
                                     <i className={`fa-solid ${soundEnabled ? 'fa-volume-high' : 'fa-volume-xmark'} menuIcon`}></i> 
                                     {soundEnabled ? 'Mute Sounds' : 'Unmute Sounds'}
@@ -761,9 +784,13 @@ function ChatWindow({ setShowShortcuts }) {
                     )}
 
                     {/* Send button */}
-                    <div id="submit" onClick={() => getReply()} style={{ opacity: messageCountToday >= 50 ? 0.5 : 1, pointerEvents: messageCountToday >= 50 ? 'none' : 'auto' }}>
-                        <i className={`fa-solid ${loading || isStreaming ? 'fa-spinner fa-spin' : 'fa-paper-plane'}`}></i>
-                    </div>
+                    <button className="chatBtn" onClick={() => getReply(null)} disabled={loading || isStreaming || messageCountToday >= 50}>
+                        {loading || isStreaming ? (
+                            <Spinner size="small" />
+                        ) : (
+                            <i className="fa-solid fa-paper-plane"></i>
+                        )}
+                    </button>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 20px', marginTop: '5px' }}>

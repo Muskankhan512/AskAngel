@@ -111,7 +111,23 @@
 }
 
 .noBookmarks {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
     text-align: center;
     color: var(--text-secondary);
-    padding: 40px 0;
+    gap: 8px;
+}
+
+.noBookmarks i {
+    font-size: 1.5rem;
+    opacity: 0.5;
+    margin-bottom: 4px;
+}
+
+.noBookmarks p {
+    font-size: 0.85rem;
+    margin: 0;
 }

@@ -333,3 +333,73 @@ input:focus {
 }
 
 .chatPdfBadge i { color: #f87171; }
+
+/* ── Mobile Responsive Styles ── */
+.hamburgerBtn {
+    display: none;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    margin-right: 15px;
+    padding: 5px;
+}
+
+.hamburgerBtn:hover {
+    color: var(--accent-color);
+}
+
+.show-on-mobile {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .hamburgerBtn {
+        display: block;
+    }
+
+    .hide-on-mobile {
+        display: none !important;
+    }
+
+    .show-on-mobile {
+        display: flex !important;
+    }
+
+    .navbar {
+        padding: 0.8rem 1rem;
+    }
+
+    .navGreeting {
+        display: none; /* Hide greeting to save space */
+    }
+
+    .chatInput {
+        padding: 0 10px 10px 10px;
+    }
+
+    .inputBox {
+        max-width: 100%;
+    }
+
+    input {
+        padding: 15px 120px 15px 15px; /* Adjust right padding for icons */
+        font-size: 0.95rem; /* slightly larger for touch readability */
+    }
+
+    #submit, .micBtn, .attachBtn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .micBtn {
+        right: 50px;
+    }
+
+    .attachBtn {
+        right: 90px;
+    }
+
+    #submit {
+        right: 5px;
+    }
+}

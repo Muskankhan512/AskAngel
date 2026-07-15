@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import './BookmarksModal.css';
 import { MyContext } from './MyContext.jsx';
+import Spinner from './Spinner.jsx';
 
 function BookmarksModal({ isOpen, onClose }) {
     const [bookmarks, setBookmarks] = useState([]);
@@ -52,11 +53,14 @@ function BookmarksModal({ isOpen, onClose }) {
                 
                 <div className="bookmarksList">
                     {loading ? (
-                        <p style={{textAlign: 'center', color: 'var(--text-secondary)'}}>Loading bookmarks...</p>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', padding: '40px 0' }}>
+                            <Spinner size="large" />
+                            <p style={{ color: 'var(--text-secondary)' }}>Loading bookmarks...</p>
+                        </div>
                     ) : bookmarks.length === 0 ? (
                         <div className="noBookmarks">
-                            <i className="fa-regular fa-bookmark" style={{fontSize: '2rem', marginBottom: '10px'}}></i>
-                            <p>No bookmarks yet. Star some messages to see them here!</p>
+                            <i className="fa-regular fa-bookmark"></i>
+                            <p>No bookmarks yet. Tap the bookmark icon on any message to save it here.</p>
                         </div>
                     ) : (
                         bookmarks.map((bm, index) => (

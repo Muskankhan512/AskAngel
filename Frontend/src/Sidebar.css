@@ -20,6 +20,8 @@ button {
     background-color: transparent;
     border: solid 0.5px var(--border-color);
     cursor: pointer;
+    transition: all 0.15s ease;
+    color: var(--text-secondary);
 }
 
 .logo {
@@ -36,6 +38,7 @@ button span {
 
 button:hover {
     background-color: var(--bg-hover);
+    color: var(--text-primary);
 }
 
 .history {
@@ -59,11 +62,14 @@ button:hover {
     align-items: center;
     gap: 8px;
     overflow: visible;
-    transition: var(--transition);
+    transition: all 0.15s ease;
+    color: var(--text-secondary);
 }
 
 .history li:hover {
     background-color: var(--bg-hover);
+    color: var(--text-primary);
+    padding-left: 16px;
 }
 
 .sign {
@@ -341,4 +347,109 @@ button:hover {
 
 .searchBox .clearSearch:hover {
     opacity: 1;
+}
+
+/* ── Mobile Responsive Styles ── */
+.sidebar-header-mobile {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.mobileTitle {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.sidebar-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+    margin: 0;
+    width: auto;
+}
+
+.sidebar-close-btn:hover {
+    background: transparent;
+    color: var(--accent-color);
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        height: 100vh;
+        z-index: 1000;
+        transition: left 0.3s ease-in-out;
+        width: 280px;
+        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar.mobile-open {
+        left: 0;
+    }
+
+    .sidebar-header-mobile {
+        display: flex;
+    }
+
+    .mobileOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 99;
+    }
+
+    .sidebar-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 99;
+        display: none;
+    }
+
+    .sidebar-backdrop.show {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+}
+
+/* ── Empty States ── */
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    text-align: center;
+    color: var(--text-secondary);
+    gap: 8px;
+}
+
+.emptyState i {
+    font-size: 1.5rem;
+    opacity: 0.5;
+    margin-bottom: 4px;
+}
+
+.emptyState p {
+    font-size: 0.85rem;
+    margin: 0;
 }
