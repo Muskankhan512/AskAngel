@@ -6,7 +6,6 @@ import Signup from "./Signup.jsx";
 import { MyContext } from "./MyContext.jsx";
 import ShortcutsModal from "./ShortcutsModal.jsx";
 import SharedChatView from "./SharedChatView.jsx";
-import { ToastProvider } from "./ToastContext";
 import { useState, useEffect } from 'react';
 import {v1 as uuidv1} from "uuid";
 
