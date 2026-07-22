@@ -350,7 +350,7 @@ pre {
     background: #2581d8;
 }
 
-/* ── Suggestions UI ── */
+/* ── Home / Welcome Screen ── */
 .newChatScreen {
     display: flex;
     flex-direction: column;
@@ -358,8 +358,9 @@ pre {
     width: 100%;
     height: 100%;
     overflow-y: auto;
-    padding: 2rem 1rem;
-    animation: slideUp 0.3s ease;
+    padding: 3rem 1.5rem 2rem;
+    animation: slideUp 0.4s ease;
+    justify-content: center;
 }
 
 .newChatScreen::before, .newChatScreen::after {
@@ -367,75 +368,121 @@ pre {
     margin: auto;
 }
 
+/* ── Avatar: smaller, more subtle ── */
 .welcomeIcon {
-    font-size: 2.5rem;
+    font-size: 1.4rem;
     color: var(--accent-color);
-    margin-bottom: 1rem;
-    background: var(--bg-tertiary);
-    width: 70px;
-    height: 70px;
+    opacity: 0.65;
+    margin-bottom: 1.6rem;
+    background: transparent;
+    border: 1.5px solid rgba(139, 92, 246, 0.25);
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    transition: opacity 0.3s ease;
 }
 
+.welcomeIcon:hover {
+    opacity: 1;
+}
+
+/* ── Greeting headline: the main focal point ── */
+.greetingHeadline {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--text-primary) 40%, var(--accent-color) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    animation: fadeInUp 0.5s ease both;
+}
+
+/* Keep h1 styles consistent if used elsewhere in newChatScreen */
 .newChatScreen h1 {
-    font-size: 2.2rem;
+    font-size: 2rem;
     margin-bottom: 0.5rem;
-    background: linear-gradient(90deg, var(--text-primary), var(--text-secondary));
+    background: linear-gradient(135deg, var(--text-primary) 40%, var(--accent-color) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 700;
 }
 
 .welcomeTagline {
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: var(--text-secondary);
-    margin-bottom: 2.5rem;
+    margin: 0 0 2.5rem 0;
+    opacity: 0.8;
+    animation: fadeInUp 0.5s 0.1s ease both;
 }
 
+/* ── Suggestion cards: minimal, border-only ── */
 .suggestionsGrid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    max-width: 650px;
+    gap: 12px;
+    max-width: 600px;
     width: 100%;
-    padding: 0 20px;
+    padding: 0 10px;
+    animation: fadeInUp 0.5s 0.2s ease both;
 }
 
 .suggestionCard {
-    background: var(--bg-tertiary);
+    background: transparent;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    padding: 18px;
+    padding: 15px 16px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
     gap: 12px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .suggestionCard:hover {
-    background: var(--bg-hover-strong);
-    transform: translateY(-5px) scale(1.01);
-    box-shadow: 0 16px 32px rgba(0,0,0,0.15);
-    border-color: var(--accent-color);
+    background: rgba(139, 92, 246, 0.06);
+    border-color: rgba(139, 92, 246, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
 .suggestionCard i {
-    font-size: 1.3rem;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    opacity: 0.7;
+    flex-shrink: 0;
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.suggestionCard:hover i {
     color: var(--accent-color);
+    opacity: 1;
 }
 
 .suggestionCard p {
-    font-size: 0.9rem;
-    color: var(--text-primary);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
     margin: 0;
     font-weight: 500;
+    line-height: 1.4;
+    transition: color 0.2s ease;
 }
+
+.suggestionCard:hover p {
+    color: var(--text-primary);
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
 
 /* Web Search UI */
 .searchBadge {
@@ -563,19 +610,24 @@ pre {
         gap: 6px;
     }
 
-    .newChatScreen h1 {
-        font-size: 1.6rem;
+    .greetingHeadline, .newChatScreen h1 {
+        font-size: 1.55rem;
     }
 
     .welcomeIcon {
-        width: 56px;
-        height: 56px;
-        font-size: 1.8rem;
+        width: 42px;
+        height: 42px;
+        font-size: 1.1rem;
+        margin-bottom: 1.2rem;
     }
 
     .welcomeTagline {
-        font-size: 0.9rem;
-        margin-bottom: 1.5rem;
+        font-size: 0.88rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .newChatScreen {
+        padding: 2rem 1rem 1.5rem;
     }
 
     .editMessageContainer {

@@ -109,12 +109,22 @@ const CustomImage = ({ node, src, alt, ...props }) => {
 };
 
 function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, streamingSearchMetadata }) {
-    const { newChat, prevChats, setPrevChats, loading, streamingText, isStreaming, language, currThreadId, token, handleLogout, persona } = useContext(MyContext);
+    const { newChat, prevChats, setPrevChats, loading, streamingText, isStreaming, language, currThreadId, token, handleLogout, persona, user } = useContext(MyContext);
     const t = translations[language];
     const [editingIndex, setEditingIndex] = useState(null);
     const [editValue, setEditValue] = useState("");
     const bottomRef = useRef(null);
     const [speakingIdx, setSpeakingIdx] = useState(null);
+
+    // Time-aware greeting
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        const name = user?.name ? `, ${user.name.split(' ')[0]}` : '';
+        if (hour >= 5 && hour < 12) return `Good morning${name}!`;
+        if (hour >= 12 && hour < 17) return `Good afternoon${name}!`;
+        if (hour >= 17 && hour < 21) return `Good evening${name}!`;
+        return `Good night${name}!`;
+    };
 
     // Strip markdown for TTS reading
     const stripMarkdown = (text) => {
@@ -224,12 +234,17 @@ function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, stre
     return (
         <div className="chatContentWrapper" style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', overflow: 'hidden' }}>
             {(newChat && !prevChats.length) ? (
-                <div className="newChatScreen">
+            <div className="newChatScreen">
+                    {/* Subtle avatar icon — smaller, less dominant */}
                     <div className="welcomeIcon">
                         <i className="fa-solid fa-robot"></i>
                     </div>
-                    <h1>AskAngel</h1>
+
+                    {/* Personalized time-aware greeting — main focal point */}
+                    <h1 className="greetingHeadline">{getGreeting()}</h1>
                     <p className="welcomeTagline">Ask me anything, I'm here to help.</p>
+
+                    {/* Suggestion cards — minimal, lighter treatment */}
                     <div className="suggestionsGrid">
                         {suggestions.map((s, i) => (
                             <div key={i} className="suggestionCard" onClick={() => onSuggestionClick(s.text)}>
