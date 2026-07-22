@@ -466,8 +466,8 @@ pre {
 }
 
 .suggestionCard p {
-    font-size: 0.9rem;         /* was 0.85rem */
-    color: #c4c4c4;            /* was var(--text-secondary) ~#9ca3af — higher contrast */
+    font-size: 0.95rem; /* slightly larger for readability */
+    color: #e0e0e0; /* higher contrast than text-secondary */
     margin: 0;
     font-weight: 500;
     line-height: 1.4;
@@ -475,7 +475,7 @@ pre {
 }
 
 .suggestionCard:hover p {
-    color: var(--text-primary);
+    color: #ffffff; /* pure white on hover for pop */
 }
 
 @keyframes fadeInUp {
