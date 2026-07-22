@@ -7,8 +7,9 @@ import { translations } from "./translations.js";
 
 function Sidebar() {
     const {allThreads, setAllThreads, currThreadId, setNewChat, setPrompt, setReply,
-           setCurrThreadId, setPrevChats, token, handleLogout, language, setPersona, prompt,
-           isSidebarOpenMobile, setIsSidebarOpenMobile} = useContext(MyContext);
+           setCurrThreadId, setPrevChats, token, handleLogout, language, setLanguage, setPersona, prompt,
+           isSidebarOpenMobile, setIsSidebarOpenMobile, theme, setTheme,
+           setIsBookmarksOpen, setIsStatsOpen, setIsProfileModalOpen, user} = useContext(MyContext);
     const [menuOpenId, setMenuOpenId] = useState(null);
     const [renamingId, setRenamingId] = useState(null);
     const [renameValue, setRenameValue] = useState("");
@@ -469,6 +470,30 @@ function Sidebar() {
                     </>
                 )}
             </ul>
+
+            <div className="mobileControls show-on-mobile">
+                <div className="mobileControlRow">
+                    <div className="mobileControlBtn" onClick={() => setIsBookmarksOpen(true)}>
+                        <i className="fa-solid fa-bookmark"></i> Bookmarks
+                    </div>
+                    <div className="mobileControlBtn" onClick={() => setIsStatsOpen(true)}>
+                        <i className="fa-solid fa-chart-simple"></i> Stats
+                    </div>
+                </div>
+                <div className="mobileControlRow">
+                    <div className="mobileControlBtn" onClick={() => setIsProfileModalOpen(true)}>
+                        <i className="fa-solid fa-user"></i> {user?.name || "Profile"}
+                    </div>
+                    <div className="mobileControlBtn" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+                        {theme === 'dark' ? <i className="fa-solid fa-sun"></i> : <i className="fa-solid fa-moon"></i>} Theme
+                    </div>
+                </div>
+                <div className="mobileControlRow" style={{ marginTop: '10px' }}>
+                    <div className="mobileControlBtn danger" onClick={handleLogout}>
+                        <i className="fa-solid fa-right-from-bracket"></i> Logout
+                    </div>
+                </div>
+            </div>
         </section>
         </>
     );

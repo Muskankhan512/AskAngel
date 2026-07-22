@@ -32,12 +32,19 @@ function App() {
 
   const [language, setLanguage] = useState(localStorage.getItem("language") || "en");
   const [persona, setPersona] = useState("Default Assistant");
-  const [model, setModel] = useState(localStorage.getItem("model") || "llama-3.3-70b-versatile");
+  const [model, setModel] = useState(localStorage.getItem("model") || "gemini-2.5-flash");
   const [messageCountToday, setMessageCountToday] = useState(0);
 
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(localStorage.getItem("soundEnabled") !== "false");
   const [isSidebarOpenMobile, setIsSidebarOpenMobile] = useState(false);
+
+  // ── Modal State ──
+  const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
+  const [isStatsOpen, setIsStatsOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [currentShareId, setCurrentShareId] = useState(null);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -133,7 +140,7 @@ function App() {
   // ── Route protection: show auth if no token ──
   if (!token) {
     return (
-      <div style={{backgroundColor: 'var(--bg-primary)', minHeight: '100vh'}}>
+      <div style={{backgroundColor: 'var(--bg-primary)', minHeight: '100dvh'}}>
         <MyContext.Provider value={{ language, setLanguage }}>
           {authView === "login"
             ? <Login onSwitch={() => setAuthView("signup")} onLogin={handleLogin} />
@@ -163,7 +170,12 @@ function App() {
     model, setModel,
     messageCountToday, setMessageCountToday,
     soundEnabled, setSoundEnabled,
-    isSidebarOpenMobile, setIsSidebarOpenMobile
+    isSidebarOpenMobile, setIsSidebarOpenMobile,
+    isBookmarksOpen, setIsBookmarksOpen,
+    isStatsOpen, setIsStatsOpen,
+    isProfileModalOpen, setIsProfileModalOpen,
+    isShareModalOpen, setIsShareModalOpen,
+    currentShareId, setCurrentShareId
   };
 
   return (

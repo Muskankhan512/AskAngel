@@ -3,6 +3,9 @@ import multer from "multer";
 import { createRequire } from "module";
 import authMiddleware from "../middleware/auth.js";
 import Thread from "../models/Thread.js";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // pdf-parse is CommonJS-only; use createRequire to load it safely in ESM
 const require = createRequire(import.meta.url);
@@ -65,84 +68,63 @@ router.post("/", upload.single("file"), async (req, res) => {
         const targetPersona = personaMap[persona] || personaMap["Default Assistant"];
         const systemPrompt = `${targetPersona}\nAlways respond in ${targetLang}, regardless of what language the user writes in.`;
 
+        let formattedMessages = [];
+        let modelOptions = {
+            model: "gemini-2.5-flash",
+            systemInstruction: systemPrompt
+        };
+
         if (isImage) {
             // ── Vision: base64-encode image, send to vision model ──
             const base64 = file.buffer.toString("base64");
             const mimeType = file.mimetype;
 
-            groqPayload = {
-                model: "meta-llama/llama-4-scout-17b-16e-instruct",
-                messages: [
-                    { role: "system", content: systemPrompt },
-                    {
-                        role: "user",
-                        content: [
-                            { type: "text", text: userQuestion },
-                            { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64}` } }
-                        ]
-                    }
-                ],
-                stream: true
-            };
+            formattedMessages = [
+                {
+                    role: "user",
+                    parts: [
+                        { text: userQuestion },
+                        {
+                            inlineData: {
+                                data: base64,
+                                mimeType: mimeType
+                            }
+                        }
+                    ]
+                }
+            ];
+            modelOptions.model = "gemini-2.5-pro"; // Better for vision
         } else if (isPDF) {
             // ── PDF: extract text, send as context ──
             const parsed = await pdfParse(file.buffer);
             const pdfText = parsed.text.slice(0, 12000); // cap at ~12k chars to stay within token limits
 
-            groqPayload = {
-                model: "llama-3.3-70b-versatile",
-                messages: [
-                    {
-                        role: "system",
-                        content: `${systemPrompt}\n\nThe user has uploaded a PDF document. Here is its extracted text content:\n\n---\n${pdfText}\n---\n\nAnswer the user's question based on this document.`
-                    },
-                    { role: "user", content: userQuestion }
-                ],
-                stream: true
-            };
+            formattedMessages = [
+                {
+                    role: "user",
+                    parts: [
+                        { text: `The user has uploaded a PDF document. Here is its extracted text content:\n\n---\n${pdfText}\n---\n\nAnswer the user's question based on this document.\n\nUser Question: ${userQuestion}` }
+                    ]
+                }
+            ];
         }
 
-        // Call Groq with streaming
-        const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.GROQ_API_KEY}`
-            },
-            body: JSON.stringify(groqPayload)
-        });
+        // Call Gemini with streaming
+        const modelInstance = genAI.getGenerativeModel(modelOptions);
+        const streamResult = await modelInstance.generateContentStream({ contents: formattedMessages });
 
-        if (!groqRes.ok) {
-            const err = await groqRes.text();
-            console.error("❌ Groq API error response:", err);
-            throw new Error(`Groq error: ${err}`);
-        }
-        console.log("✅ Groq stream started successfully");
+        console.log("✅ Gemini stream started successfully");
 
-        // Stream response to client
-        const reader = groqRes.body.getReader();
-        const decoder = new TextDecoder();
         let fullReply = "";
 
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            const chunk = decoder.decode(value, { stream: true });
-            const lines = chunk.split("\n").filter(l => l.startsWith("data: "));
-
-            for (const line of lines) {
-                const raw = line.slice(6).trim();
-                if (raw === "[DONE]") continue;
-                try {
-                    const parsed = JSON.parse(raw);
-                    const token = parsed.choices?.[0]?.delta?.content;
-                    if (token) {
-                        fullReply += token;
-                        res.write(`data: ${JSON.stringify({ token })}\n\n`);
-                    }
-                } catch (_) { }
-            }
+        for await (const chunk of streamResult.stream) {
+            try {
+                const text = chunk.text();
+                if (text) {
+                    fullReply += text;
+                    res.write(`data: ${JSON.stringify({ token: text })}\n\n`);
+                }
+            } catch (e) {}
         }
 
         // Save to MongoDB

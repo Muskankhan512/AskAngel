@@ -20,7 +20,12 @@ function ChatWindow({ setShowShortcuts }) {
         model, setModel,
         messageCountToday, setMessageCountToday,
         soundEnabled, setSoundEnabled,
-        isSidebarOpenMobile, setIsSidebarOpenMobile
+        isSidebarOpenMobile, setIsSidebarOpenMobile,
+        isBookmarksOpen, setIsBookmarksOpen,
+        isStatsOpen, setIsStatsOpen,
+        isProfileModalOpen, setIsProfileModalOpen,
+        isShareModalOpen, setIsShareModalOpen,
+        currentShareId, setCurrentShareId
     } = useContext(MyContext);
 
     const t = translations[language];
@@ -31,13 +36,8 @@ function ChatWindow({ setShowShortcuts }) {
     const [isLangOpen, setIsLangOpen] = useState(false);
     const [isPersonaOpen, setIsPersonaOpen] = useState(false);
     const [isExportOpen, setIsExportOpen] = useState(false);
-    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-    const [currentShareId, setCurrentShareId] = useState(null);
     const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
-    const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
     const [isModelOpen, setIsModelOpen] = useState(false);
-    const [isStatsOpen, setIsStatsOpen] = useState(false);
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -535,7 +535,7 @@ function ChatWindow({ setShowShortcuts }) {
                     <span className="navbarTitle">AskAngel <i className="fa-solid fa-chevron-down"></i></span>
                 </div>
                 <div className="navbarControls" ref={navRef}>
-                    {user && <span className="navGreeting">Hi, {user.name}!</span>}
+                    {user && <span className="navGreeting hide-on-mobile">Hi, {user.name}!</span>}
                     
                     {/* Bookmarks Toggle */}
                     <div
@@ -552,14 +552,14 @@ function ChatWindow({ setShowShortcuts }) {
                         onClick={() => { setIsModelOpen(!isModelOpen); setIsPersonaOpen(false); setIsLangOpen(false); setIsOpen(false); setIsMoreMenuOpen(false); }}
                         title="Select Model"
                     >
-                        <i className="fa-solid fa-brain"></i> {model === "llama-3.3-70b-versatile" ? "Llama 3.3 70B" : model === "llama-3.1-8b-instant" ? "Llama 3.1 8B" : "Mixtral 8x7B"}
+                        <i className="fa-solid fa-brain"></i> {model === "gemini-2.5-pro" ? "Gemini 2.5 Pro" : model === "gemini-2.5-flash" ? "Gemini 2.5 Flash" : "Gemini 1.5 Flash"}
                         
                         {isModelOpen && (
                             <div className="dropDown" style={{ top: '45px', right: '0', minWidth: '180px' }}>
                                 {[
-                                    { id: "llama-3.3-70b-versatile", name: "Llama 3.3 70B (Best Quality)" },
-                                    { id: "llama-3.1-8b-instant", name: "Llama 3.1 8B (Fastest)" },
-                                    { id: "mixtral-8x7b-32768", name: "Mixtral 8x7B (Balanced)" }
+                                    { id: "gemini-2.5-pro", name: "Gemini 2.5 Pro (Best Quality)" },
+                                    { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash (Fast)" },
+                                    { id: "gemini-1.5-flash", name: "Gemini 1.5 Flash (Legacy)" }
                                 ].map((m) => (
                                     <div 
                                         key={m.id}
@@ -632,7 +632,7 @@ function ChatWindow({ setShowShortcuts }) {
 
                     {/* Theme Toggle */}
                     <div
-                        className="navItem iconItem"
+                        className="navItem iconItem hide-on-mobile"
                         onClick={() => {
                             setTheme(theme === 'dark' ? 'light' : 'dark');
                             setIsOpen(false);
@@ -647,7 +647,7 @@ function ChatWindow({ setShowShortcuts }) {
 
                     {/* More Options (...) */}
                     <div
-                        className="navItem iconItem"
+                        className="navItem iconItem hide-on-mobile"
                         onClick={() => { setIsMoreMenuOpen(!isMoreMenuOpen); setIsPersonaOpen(false); setIsLangOpen(false); setIsOpen(false); }}
                         title="More options"
                     >
@@ -689,8 +689,23 @@ function ChatWindow({ setShowShortcuts }) {
                         )}
                     </div>
 
+                    {/* Mobile Only: New Chat Action */}
+                    <div
+                        className="navItem iconItem show-on-mobile"
+                        onClick={() => {
+                            setNewChat(true);
+                            setPrompt("");
+                            setReply(null);
+                            setCurrThreadId(uuidv1());
+                            setPrevChats([]);
+                        }}
+                        title="New Chat"
+                    >
+                        <i className="fa-solid fa-pen-to-square"></i>
+                    </div>
+
                     {/* User Avatar */}
-                    <div className="userIconDiv navItem" onClick={() => { setIsOpen(!isOpen); setIsLangOpen(false); setIsPersonaOpen(false); setIsMoreMenuOpen(false); }}>
+                    <div className="userIconDiv navItem hide-on-mobile" onClick={() => { setIsOpen(!isOpen); setIsLangOpen(false); setIsPersonaOpen(false); setIsMoreMenuOpen(false); }}>
                         <span className="userIcon">
                             {user?.avatar ? <img src={user.avatar} alt="avatar" style={{width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover'}} /> : <i className="fa-solid fa-user"></i>}
                         </span>
@@ -784,7 +799,7 @@ function ChatWindow({ setShowShortcuts }) {
                     )}
 
                     {/* Send button */}
-                    <button className="chatBtn" onClick={() => getReply(null)} disabled={loading || isStreaming || messageCountToday >= 50}>
+                    <button id="submit" onClick={() => getReply(null)} disabled={loading || isStreaming || messageCountToday >= 50}>
                         {loading || isStreaming ? (
                             <Spinner size="small" />
                         ) : (

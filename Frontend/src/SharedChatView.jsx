@@ -44,7 +44,7 @@ function SharedChatView({ shareId }) {
 
     if (loading) {
         return (
-            <div className="app" style={{ display: 'flex', flexDirection: 'column', gap: '15px', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw' }}>
+            <div className="app" style={{ display: 'flex', flexDirection: 'column', gap: '15px', justifyContent: 'center', alignItems: 'center', height: '100dvh', width: '100vw' }}>
                 <Spinner size="large" />
                 <h2 style={{ color: 'var(--text-primary)' }}>Loading shared conversation...</h2>
             </div>
@@ -53,7 +53,7 @@ function SharedChatView({ shareId }) {
 
     if (error) {
         return (
-            <div className="app" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw' }}>
+            <div className="app" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100dvh', width: '100vw' }}>
                 <i className="fa-solid fa-link-slash" style={{ fontSize: '4rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}></i>
                 <h2 style={{ color: 'var(--text-primary)' }}>This chat is no longer available</h2>
                 <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>{error}</p>
@@ -68,7 +68,7 @@ function SharedChatView({ shareId }) {
     }
 
     return (
-        <div className="app" style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh', overflow: 'hidden' }}>
+        <div className="app" style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100dvh', overflow: 'hidden' }}>
             <div className="navbar" style={{ width: '100%', boxSizing: 'border-box', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'center' }}>
                 <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>AskAngel</span>
                 <div style={{ position: 'absolute', right: '20px', display: 'flex', alignItems: 'center', gap: '15px' }}>

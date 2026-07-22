@@ -1,7 +1,7 @@
 import express from "express";
 import Thread from "../models/Thread.js";
 import User from "../models/User.js";
-import { groqChatStream, generateTitle } from "../utils/openai.js";
+import { geminiChatStream, generateTitle } from "../utils/gemini.js";
 import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
@@ -106,7 +106,7 @@ router.get("/chat/search", async (req, res) => {
 
 // ── STREAMING chat route using SSE ──
 router.post("/chat", async (req, res) => {
-    const { threadId, message, language, persona = 'Default Assistant', model = "llama-3.3-70b-versatile" } = req.body;
+    const { threadId, message, language, persona = 'Default Assistant', model = "gemini-2.5-flash" } = req.body;
     if (!threadId || !message) return res.status(400).json({ error: "Missing required fields" });
 
     try {
@@ -154,7 +154,7 @@ router.post("/chat", async (req, res) => {
 
         // Pass entire message history to groqChatStream
         const activePersona = thread.persona || persona;
-        const { fullReply, searchMetadata } = await groqChatStream(thread.messages, activePersona, language, res, model);
+        const { fullReply, searchMetadata } = await geminiChatStream(thread.messages, activePersona, language, res, model);
 
         // Save full assembled reply to MongoDB
         const newAssistantMessage = { 
@@ -192,7 +192,7 @@ router.post("/chat", async (req, res) => {
 
 // ── EDIT message route ──
 router.put("/chat/edit", async (req, res) => {
-    const { threadId, messageIndex, message, language, persona = 'Default Assistant', model = "llama-3.3-70b-versatile" } = req.body;
+    const { threadId, messageIndex, message, language, persona = 'Default Assistant', model = "gemini-2.5-flash" } = req.body;
     if (!threadId || typeof messageIndex !== 'number' || !message) {
         return res.status(400).json({ error: "Missing required fields" });
     }
@@ -233,7 +233,7 @@ router.put("/chat/edit", async (req, res) => {
         thread.messages.push({ role: "user", content: message });
 
         const activePersona = thread.persona || persona;
-        const { fullReply, searchMetadata } = await groqChatStream(thread.messages, activePersona, language, res, model);
+        const { fullReply, searchMetadata } = await geminiChatStream(thread.messages, activePersona, language, res, model);
 
         const newAssistantMessage = { 
             role: "assistant", 
@@ -261,7 +261,7 @@ router.put("/chat/edit", async (req, res) => {
 
 // ── REGENERATE message route ──
 router.post("/chat/regenerate", async (req, res) => {
-    const { threadId, aiMessageIndex, language, persona = 'Default Assistant', model = "llama-3.3-70b-versatile" } = req.body;
+    const { threadId, aiMessageIndex, language, persona = 'Default Assistant', model = "gemini-2.5-flash" } = req.body;
     if (!threadId || typeof aiMessageIndex !== 'number') {
         return res.status(400).json({ error: "Missing required fields" });
     }
@@ -303,8 +303,8 @@ router.post("/chat/regenerate", async (req, res) => {
 
         const activePersona = thread.persona || persona;
         
-        // Pass the truncated message history (which ends with the user's last message) to Groq
-        const { fullReply, searchMetadata } = await groqChatStream(thread.messages, activePersona, language, res, model);
+        // Pass the truncated message history (which ends with the user's last message) to Groq/Gemini
+        const { fullReply, searchMetadata } = await geminiChatStream(thread.messages, activePersona, language, res, model);
 
         const newAssistantMessage = { 
             role: "assistant", 

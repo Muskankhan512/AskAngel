@@ -1,12 +1,13 @@
 .sidebar {
     background-color: var(--bg-secondary);
     color: var(--text-secondary);
-    height: 100vh;
+    height: 100dvh;
     width: 320px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     flex-shrink: 0;
+    max-height: 100dvh;
 }
 
 
@@ -47,6 +48,7 @@ button:hover {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
+    min-height: 0;
 }
 
 .history li {
@@ -385,7 +387,7 @@ button:hover {
         position: fixed;
         top: 0;
         left: -100%;
-        height: 100vh;
+        height: 100dvh;
         z-index: 1000;
         transition: left 0.3s ease-in-out;
         width: 280px;
@@ -405,7 +407,7 @@ button:hover {
         top: 0;
         left: 0;
         width: 100vw;
-        height: 100vh;
+        height: 100dvh;
         background-color: rgba(0, 0, 0, 0.5);
         z-index: 99;
     }
@@ -452,4 +454,61 @@ button:hover {
 .emptyState p {
     font-size: 0.85rem;
     margin: 0;
+}
+
+/* ── Mobile Controls ── */
+.mobileControls {
+    padding: 15px;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+    display: none;
+}
+
+@media screen and (max-width: 768px) {
+    .show-on-mobile.mobileControls {
+        display: block;
+    }
+}
+
+.mobileControlRow {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.mobileControlRow:last-child {
+    margin-bottom: 0;
+}
+
+.mobileControlBtn {
+    flex: 1;
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    padding: 10px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.mobileControlBtn:hover {
+    background-color: var(--bg-hover-strong);
+}
+
+.mobileControlBtn.danger {
+    color: #ef4444;
+}
+
+.mobileControlBtn i {
+    color: var(--text-secondary);
+}
+
+.mobileControlBtn.danger i {
+    color: #ef4444;
 }
