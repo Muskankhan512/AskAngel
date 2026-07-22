@@ -178,7 +178,7 @@ export const geminiChatStream = async (messageHistory, persona, language, res, m
                             res.write(`data: ${JSON.stringify({ type: "search_started", query })}\n\n`);
                         }
                         const results = await executeWebSearch(query);
-                        return { name: tc.name, query, results };
+                        return { id: tc.id, name: tc.name, query, results };
                     }
                 } else if (tc.name === "generate_image") {
                     const imgPrompt = tc.args.prompt || "image";
@@ -198,7 +198,7 @@ export const geminiChatStream = async (messageHistory, persona, language, res, m
                                 fullReply += rejectionMsg; // Save to history
                             }
                             // Return BLOCKED to the main model so it doesn't hallucinate a success
-                            return { name: tc.name, query: imgPrompt, results: [{ content: "BLOCKED_REAL_PERSON" }], blocked: true };
+                            return { id: tc.id, name: tc.name, query: imgPrompt, results: [{ content: "BLOCKED_REAL_PERSON" }], blocked: true };
                         }
                     } catch (e) {
                         console.error("Safety check failed, defaulting to allow", e);
@@ -214,9 +214,9 @@ export const geminiChatStream = async (messageHistory, persona, language, res, m
                         fullReply += md; // Append markdown to the actual message history
                     }
 
-                    return { name: tc.name, query: imgPrompt, results: [{ content: md }] };
+                    return { id: tc.id, name: tc.name, query: imgPrompt, results: [{ content: md }] };
                 }
-                return { name: tc.name, query: null, results: [] };
+                return { id: tc.id, name: tc.name, query: null, results: [] };
             });
 
             const resolvedTools = await Promise.all(toolExecutions);
@@ -239,11 +239,18 @@ export const geminiChatStream = async (messageHistory, persona, language, res, m
                     };
                 }
 
+                let functionResponsePart = {
+                    name: resolved.name,
+                    response: toolResultObj
+                };
+                
+                // Newer Gemini API versions require the id to match the functionCall
+                if (resolved.id) {
+                    functionResponsePart.id = resolved.id;
+                }
+
                 functionResponses.push({
-                    functionResponse: {
-                        name: resolved.name,
-                        response: toolResultObj
-                    }
+                    functionResponse: functionResponsePart
                 });
             }
 
@@ -261,7 +268,9 @@ export const geminiChatStream = async (messageHistory, persona, language, res, m
             if (modelMessage && Array.isArray(modelMessage.parts)) {
                 modelMessage.parts.forEach(part => {
                     if (part.functionCall) {
-                        part.functionCall.thought_signature = "skip_thought_signature_validator";
+                        part.thoughtSignature = "skip_thought_signature_validator";
+                        // Also clear any previous incorrect bypass just in case
+                        delete part.functionCall.thought_signature;
                     }
                 });
             }
