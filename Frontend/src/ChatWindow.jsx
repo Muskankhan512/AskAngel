@@ -649,26 +649,29 @@ function ChatWindow({ setShowShortcuts }) {
                         {theme === 'dark' ? <i className="fa-solid fa-sun"></i> : <i className="fa-solid fa-moon"></i>}
                     </div>
 
-                    {/* More Options (...) */}
+                    {/* More Options (...) — always visible, shows extra items on mobile */}
                     <div
-                        className="navItem iconItem hide-on-mobile"
+                        className="navItem iconItem"
                         onClick={() => { setIsMoreMenuOpen(!isMoreMenuOpen); setIsPersonaOpen(false); setIsLangOpen(false); setIsOpen(false); }}
                         title="More options"
                     >
                         <i className="fa-solid fa-ellipsis-vertical"></i>
                         {isMoreMenuOpen && (
-                            <div className="dropDown" style={{top: '45px', right: '0', minWidth: '180px'}}>
-                                <div className="dropDownItem show-on-mobile" onClick={(e) => { e.stopPropagation(); setIsBookmarksOpen(true); setIsMoreMenuOpen(false); }}>
+                            <div className="dropDown" style={{top: '45px', right: '0', minWidth: '200px'}}>
+                                <div className="dropDownItem hide-on-desktop" onClick={(e) => { e.stopPropagation(); setIsBookmarksOpen(true); setIsMoreMenuOpen(false); }}>
                                     <i className="fa-solid fa-bookmark menuIcon"></i> Bookmarks
                                 </div>
-                                <div className="dropDownItem show-on-mobile" onClick={(e) => { e.stopPropagation(); setIsModelOpen(true); setIsMoreMenuOpen(false); }}>
+                                <div className="dropDownItem hide-on-desktop" onClick={(e) => { e.stopPropagation(); setIsModelOpen(true); setIsMoreMenuOpen(false); }}>
                                     <i className="fa-solid fa-brain menuIcon"></i> Change Model
                                 </div>
-                                <div className="dropDownItem show-on-mobile" onClick={(e) => { e.stopPropagation(); setIsPersonaOpen(true); setIsMoreMenuOpen(false); }}>
+                                <div className="dropDownItem hide-on-desktop" onClick={(e) => { e.stopPropagation(); setIsPersonaOpen(true); setIsMoreMenuOpen(false); }}>
                                     <i className="fa-solid fa-user-astronaut menuIcon"></i> Change Persona
                                 </div>
-                                <div className="dropDownItem show-on-mobile" onClick={(e) => { e.stopPropagation(); setIsLangOpen(true); setIsMoreMenuOpen(false); }}>
+                                <div className="dropDownItem hide-on-desktop" onClick={(e) => { e.stopPropagation(); setIsLangOpen(true); setIsMoreMenuOpen(false); }}>
                                     <i className="fa-solid fa-language menuIcon"></i> Change Language
+                                </div>
+                                <div className="dropDownItem hide-on-desktop" onClick={(e) => { e.stopPropagation(); setTheme(theme === 'dark' ? 'light' : 'dark'); setIsMoreMenuOpen(false); }}>
+                                    <i className={`fa-solid ${theme === 'dark' ? 'fa-sun' : 'fa-moon'} menuIcon`}></i> {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
                                 </div>
                                 <div className="dropDownItem" onClick={(e) => { e.stopPropagation(); setSoundEnabled(!soundEnabled); setIsMoreMenuOpen(false); }}>
                                     <i className={`fa-solid ${soundEnabled ? 'fa-volume-high' : 'fa-volume-xmark'} menuIcon`}></i> 
@@ -688,6 +691,12 @@ function ChatWindow({ setShowShortcuts }) {
                                 </div>
                                 <div className="dropDownItem" onClick={() => { setIsMoreMenuOpen(false); setIsStatsOpen(true); }}>
                                     <i className="fa-solid fa-chart-simple menuIcon"></i> Insights & Stats
+                                </div>
+                                <div className="dropDownItem hide-on-desktop" onClick={() => { setIsProfileModalOpen(true); setIsMoreMenuOpen(false); }}>
+                                    <i className="fa-solid fa-gear menuIcon"></i> Profile Settings
+                                </div>
+                                <div className="dropDownItem danger hide-on-desktop" onClick={handleLogout}>
+                                    <i className="fa-solid fa-arrow-right-from-bracket menuIcon"></i> {t.logout}
                                 </div>
                             </div>
                         )}
@@ -812,7 +821,7 @@ function ChatWindow({ setShowShortcuts }) {
                     </button>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 20px', marginTop: '5px' }}>
+                <div className="charCounterRow" style={{ marginTop: '5px' }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                         {prompt.length} {t.characters} | ~{Math.round(prompt.length / 4)} {t.tokensApprox}
                     </span>
