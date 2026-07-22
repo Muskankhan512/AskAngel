@@ -182,8 +182,38 @@ export const geminiChatStream = async (messageHistory, persona, language, res, m
                     }
                 } else if (tc.name === "generate_image") {
                     const imgPrompt = tc.args.prompt || "image";
+
+                    // ── SAFETY CHECK FOR REAL PEOPLE ──
+                    const checkModel = genAI.getGenerativeModel({ model: "gemini-flash-lite-latest" });
+                    const checkPrompt = `Does this image generation prompt ask for an image of a real, identifiable person (like a celebrity, public figure, politician, actor, or named individual)? Answer only YES or NO.\nPrompt: "${imgPrompt}"`;
+                    
+                    try {
+                        const checkRes = await checkModel.generateContent(checkPrompt);
+                        const answer = checkRes.response.text().trim().toUpperCase();
+                        
+                        if (answer.includes("YES")) {
+                            const rejectionMsg = `\n\nMain real logon ki tasveer generate nahi kar sakti privacy aur likeness rights ki wajah se. Lekin main iss style ka fictional character bana sakti hoon — batao kaisa look chahiye?\n\n`;
+                            if (res && typeof res.write === "function") {
+                                res.write(`data: ${JSON.stringify({ token: rejectionMsg })}\n\n`);
+                                fullReply += rejectionMsg; // Save to history
+                            }
+                            // Return BLOCKED to the main model so it doesn't hallucinate a success
+                            return { name: tc.name, query: imgPrompt, results: [{ content: "BLOCKED_REAL_PERSON" }], blocked: true };
+                        }
+                    } catch (e) {
+                        console.error("Safety check failed, defaulting to allow", e);
+                    }
+
+                    // ── IF SAFE, GENERATE URL AND STREAM MARKDOWN ──
                     const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imgPrompt)}?width=1024&height=1024&nologo=true`;
-                    const md = `![${imgPrompt}](${imageUrl})`;
+                    const md = `\n\n![${imgPrompt}](${imageUrl})\n\n`;
+                    
+                    // Stream the markdown immediately so it renders in the chat UI
+                    if (res && typeof res.write === "function") {
+                        res.write(`data: ${JSON.stringify({ token: md })}\n\n`);
+                        fullReply += md; // Append markdown to the actual message history
+                    }
+
                     return { name: tc.name, query: imgPrompt, results: [{ content: md }] };
                 }
                 return { name: tc.name, query: null, results: [] };
@@ -224,17 +254,14 @@ export const geminiChatStream = async (messageHistory, persona, language, res, m
                 }
             }
 
-            // Fix for Gemini API "missing thought_signature" error
-            // The SDK may drop thoughtSignature from candidates[0].content, so we manually
-            // restore it or use the bypass validator string to prevent 400 Bad Request.
+            // ── BYPASS thought_signature VALIDATOR ──
+            // Newer Gemini models require a thought_signature in the functionCall. 
+            // If the SDK strips it, returning the call throws a 400 Bad Request.
+            // Google explicitly supports this string to bypass the strict check.
             if (modelMessage && Array.isArray(modelMessage.parts)) {
                 modelMessage.parts.forEach(part => {
                     if (part.functionCall) {
-                        // Some versions expect it on the part, some inside functionCall.
-                        // The official escape hatch is "skip_thought_signature_validator"
-                        if (!part.thoughtSignature && !part.thought_signature) {
-                            part.thoughtSignature = "skip_thought_signature_validator";
-                        }
+                        part.functionCall.thought_signature = "skip_thought_signature_validator";
                     }
                 });
             }
