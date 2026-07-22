@@ -100,7 +100,7 @@ Always respond in ${targetLang}, regardless of what language the user writes in.
 
 IMPORTANT INSTRUCTION FOR TOOL USAGE:
 1. ONLY use the web_search tool if the user explicitly asks a question requiring real-time information or facts you do not know. DO NOT use the web_search tool for casual conversational messages.
-2. YOU CAN GENERATE IMAGES. You have access to the \`generate_image\` tool. If the user asks for a picture, photo, image, drawing, or painting (in any language, including Hindi/Hinglish), you MUST use the \`generate_image\` tool. NEVER say "I am a text-based AI and cannot generate images". Let the tool handle the image creation.`;
+2. YOU CAN GENERATE IMAGES. You have access to the \`generate_image\` tool. If the user asks for a picture, photo, image, drawing, or painting (in any language, including Hindi/Hinglish), you MUST IMMEDIATELY use the \`generate_image\` tool. NEVER say "I cannot copy images from the internet". NEVER ask for permission to generate an image. Just call the tool and let the system handle it.`;
 
     const formattedMessages = messageHistory.map(m => {
         // Handle images in messages if they exist
