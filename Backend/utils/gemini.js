@@ -95,7 +95,12 @@ export const geminiChatStream = async (messageHistory, persona, language, res, m
 - Keep paragraphs concise. Avoid walls of text.`;
 
     const targetPersona = personaMap[persona] || personaMap["Default Assistant"];
-    const systemPrompt = `${targetPersona}${markdownInstructions}\nAlways respond in ${targetLang}, regardless of what language the user writes in.\nIMPORTANT INSTRUCTION FOR TOOL USAGE:\n1. ONLY use the web_search tool if the user explicitly asks a question requiring real-time information or facts you do not know. DO NOT use the web_search tool for casual conversational messages, greetings like "hello", "hi", or generic statements.\n2. ONLY use the generate_image tool for EXPLICIT requests to create an image. Do NOT use it for casual conversation, questions, or greetings like "kya kar rahe ho". If you are unsure whether the user wants an image or just to chat, DO NOT use the tool and reply normally in text.`;
+    const systemPrompt = `${targetPersona}${markdownInstructions}
+Always respond in ${targetLang}, regardless of what language the user writes in.
+
+IMPORTANT INSTRUCTION FOR TOOL USAGE:
+1. ONLY use the web_search tool if the user explicitly asks a question requiring real-time information or facts you do not know. DO NOT use the web_search tool for casual conversational messages.
+2. YOU CAN GENERATE IMAGES. You have access to the \`generate_image\` tool. If the user asks for a picture, photo, image, drawing, or painting (in any language, including Hindi/Hinglish), you MUST use the \`generate_image\` tool. NEVER say "I am a text-based AI and cannot generate images". Let the tool handle the image creation.`;
 
     const formattedMessages = messageHistory.map(m => {
         // Handle images in messages if they exist
