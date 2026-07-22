@@ -410,13 +410,9 @@ button:hover {
         height: 100dvh;
         z-index: 1000;
         transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        width: 280px;     /* visual width of the drawer */
-        flex-shrink: 0;
+        width: 280px;
         box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
-        /* Critical: zero width in flex layout so ChatWindow fills full screen */
-        min-width: 0;
-        max-width: 0;
-        overflow: visible; /* still renders the slide-out panel */
+        overflow: hidden; /* prevent any child from bleeding outside sidebar */
     }
 
     .sidebar.mobile-open {
