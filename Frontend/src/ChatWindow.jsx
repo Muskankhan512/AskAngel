@@ -555,14 +555,14 @@ function ChatWindow({ setShowShortcuts }) {
                         onClick={() => { setIsModelOpen(!isModelOpen); setIsPersonaOpen(false); setIsLangOpen(false); setIsOpen(false); setIsMoreMenuOpen(false); }}
                         title="Select Model"
                     >
-                        <i className="fa-solid fa-brain"></i> {model === "gemini-pro-latest" ? "Gemini Pro" : model === "gemini-flash-latest" ? "Gemini Flash" : "Gemini 1.5 Flash 8B"}
+                        <i className="fa-solid fa-brain"></i> {model === "gemini-pro-latest" ? "Gemini Pro" : model === "gemini-flash-latest" ? "Gemini Flash" : "Gemini Flash Lite"}
                         
                         {isModelOpen && (
                             <div className="dropDown" style={{ top: '45px', right: '0', minWidth: '180px' }}>
                                 {[
                                     { id: "gemini-pro-latest", name: "Gemini Pro (Best Quality)" },
                                     { id: "gemini-flash-latest", name: "Gemini Flash (Fast)" },
-                                    { id: "gemini-1.5-flash-8b", name: "Gemini 1.5 Flash 8B (Legacy)" }
+                                    { id: "gemini-flash-lite-latest", name: "Gemini Flash Lite (Fastest)" }
                                 ].map((m) => (
                                     <div 
                                         key={m.id}
