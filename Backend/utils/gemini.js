@@ -118,9 +118,25 @@ export const geminiChatStream = async (messageHistory, persona, language, res, m
     let fullReply = "";
     let searchMetadata = null; 
 
+    const req = { contents: formattedMessages };
+    
+    // Helper to retry API calls on rate limit or 503 errors
+    const executeWithRetry = async (apiCallFn) => {
+        try {
+            return await apiCallFn();
+        } catch (e) {
+            const isRateLimit = e.message.includes("Quota exceeded") || e.message.includes("429") || e.message.includes("503");
+            if (isRateLimit) {
+                console.log("Gemini API busy or rate limit hit. Retrying in 2.5 seconds...");
+                await new Promise(resolve => setTimeout(resolve, 2500));
+                return await apiCallFn();
+            }
+            throw e;
+        }
+    };
+
     try {
-        const req = { contents: formattedMessages };
-        let streamResult = await modelInstance.generateContentStream(req);
+        let streamResult = await executeWithRetry(() => modelInstance.generateContentStream(req));
         
         let isFunctionCall = false;
         let functionCalls = [];
@@ -218,7 +234,7 @@ export const geminiChatStream = async (messageHistory, persona, language, res, m
                 }
             ];
 
-            const stream2 = await modelInstance.generateContentStream({ contents: newContents });
+            const stream2 = await executeWithRetry(() => modelInstance.generateContentStream({ contents: newContents }));
             
             for await (const chunk of stream2.stream) {
                 try {
@@ -236,7 +252,7 @@ export const geminiChatStream = async (messageHistory, persona, language, res, m
         console.error("Gemini chat error:", e.message);
         if (res && typeof res.write === "function") {
             const userFriendlyError = e.message.includes("Quota exceeded") || e.message.includes("429") 
-                ? "API is busy or rate limit reached. Please wait a moment and try again." 
+                ? "Gemini API rate limit reached. Please wait a moment and try again." 
                 : e.message;
             res.write(`data: ${JSON.stringify({ error: userFriendlyError })}\n\n`);
         }
