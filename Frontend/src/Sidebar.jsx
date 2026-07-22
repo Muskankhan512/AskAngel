@@ -122,6 +122,7 @@ function Sidebar() {
 
     const changeThread = async (newThreadId) => {
         setCurrThreadId(newThreadId);
+        setIsSidebarOpenMobile(false); // auto-close drawer on mobile after selecting a chat
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:8080"}/api/thread/${newThreadId}`, { headers: authHeaders });
             if (response.status === 401) { handleLogout(); return; }

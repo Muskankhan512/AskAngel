@@ -16,3 +16,11 @@ body {
     width: 100vw;
     overflow: hidden;
 }
+
+/* On mobile, sidebar is fixed-position so it takes no layout space.
+   ChatWindow must fill the full width. */
+@media (max-width: 1024px) {
+    .app {
+        flex-direction: column;
+    }
+}
