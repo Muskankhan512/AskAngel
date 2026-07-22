@@ -466,8 +466,8 @@ pre {
 }
 
 .suggestionCard p {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
+    font-size: 0.9rem;         /* was 0.85rem */
+    color: #c4c4c4;            /* was var(--text-secondary) ~#9ca3af — higher contrast */
     margin: 0;
     font-weight: 500;
     line-height: 1.4;
