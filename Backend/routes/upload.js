@@ -70,7 +70,7 @@ router.post("/", upload.single("file"), async (req, res) => {
 
         let formattedMessages = [];
         let modelOptions = {
-            model: "gemini-2.5-flash",
+            model: "gemini-flash-latest",
             systemInstruction: systemPrompt
         };
 
@@ -93,7 +93,7 @@ router.post("/", upload.single("file"), async (req, res) => {
                     ]
                 }
             ];
-            modelOptions.model = "gemini-2.5-pro"; // Better for vision
+            modelOptions.model = "gemini-pro-latest"; // Better for vision
         } else if (isPDF) {
             // ── PDF: extract text, send as context ──
             const parsed = await pdfParse(file.buffer);

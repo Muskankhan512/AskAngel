@@ -32,7 +32,7 @@ function App() {
 
   const [language, setLanguage] = useState(localStorage.getItem("language") || "en");
   const [persona, setPersona] = useState("Default Assistant");
-  const [model, setModel] = useState(localStorage.getItem("model") || "gemini-2.5-flash");
+  const [model, setModel] = useState(localStorage.getItem("model") || "gemini-flash-latest");
   const [messageCountToday, setMessageCountToday] = useState(0);
 
   const [showShortcuts, setShowShortcuts] = useState(false);

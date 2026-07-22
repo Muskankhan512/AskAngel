@@ -65,7 +65,7 @@ async function executeWebSearch(query) {
     }
 }
 
-export const geminiChatStream = async (messageHistory, persona, language, res, model = "gemini-2.5-flash") => {
+export const geminiChatStream = async (messageHistory, persona, language, res, model = "gemini-flash-latest") => {
     const langMap = {
         'en': 'English',
         'hi': 'pure, natural Hindi (Devanagari script)',

@@ -106,7 +106,7 @@ router.get("/chat/search", async (req, res) => {
 
 // ── STREAMING chat route using SSE ──
 router.post("/chat", async (req, res) => {
-    const { threadId, message, language, persona = 'Default Assistant', model = "gemini-2.5-flash" } = req.body;
+    const { threadId, message, language, persona = 'Default Assistant', model = "gemini-flash-latest" } = req.body;
     if (!threadId || !message) return res.status(400).json({ error: "Missing required fields" });
 
     try {
@@ -192,7 +192,7 @@ router.post("/chat", async (req, res) => {
 
 // ── EDIT message route ──
 router.put("/chat/edit", async (req, res) => {
-    const { threadId, messageIndex, message, language, persona = 'Default Assistant', model = "gemini-2.5-flash" } = req.body;
+    const { threadId, messageIndex, message, language, persona = 'Default Assistant', model = "gemini-flash-latest" } = req.body;
     if (!threadId || typeof messageIndex !== 'number' || !message) {
         return res.status(400).json({ error: "Missing required fields" });
     }
@@ -261,7 +261,7 @@ router.put("/chat/edit", async (req, res) => {
 
 // ── REGENERATE message route ──
 router.post("/chat/regenerate", async (req, res) => {
-    const { threadId, aiMessageIndex, language, persona = 'Default Assistant', model = "gemini-2.5-flash" } = req.body;
+    const { threadId, aiMessageIndex, language, persona = 'Default Assistant', model = "gemini-flash-latest" } = req.body;
     if (!threadId || typeof aiMessageIndex !== 'number') {
         return res.status(400).json({ error: "Missing required fields" });
     }
