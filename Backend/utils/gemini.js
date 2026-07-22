@@ -224,6 +224,21 @@ export const geminiChatStream = async (messageHistory, persona, language, res, m
                 }
             }
 
+            // Fix for Gemini API "missing thought_signature" error
+            // The SDK may drop thoughtSignature from candidates[0].content, so we manually
+            // restore it or use the bypass validator string to prevent 400 Bad Request.
+            if (modelMessage && Array.isArray(modelMessage.parts)) {
+                modelMessage.parts.forEach(part => {
+                    if (part.functionCall) {
+                        // Some versions expect it on the part, some inside functionCall.
+                        // The official escape hatch is "skip_thought_signature_validator"
+                        if (!part.thoughtSignature && !part.thought_signature) {
+                            part.thoughtSignature = "skip_thought_signature_validator";
+                        }
+                    }
+                });
+            }
+
             // Start 2nd Stream with function response
             const newContents = [
                 ...formattedMessages,
