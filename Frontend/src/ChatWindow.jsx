@@ -213,30 +213,33 @@ function ChatWindow({ setShowShortcuts }) {
                     playDing();
                     return;
                 }
+                let parsed;
                 try {
-                    const parsed = JSON.parse(raw);
-                    if (parsed.type === "quota") {
-                        setMessageCountToday(parsed.messageCountToday);
-                    } else if (parsed.token) {
-                        accumulated += parsed.token;
-                        setStreamingText(accumulated);
-                    }
-                    if (parsed.error) {
-                        console.error("❌ Stream error from server:", parsed.error);
-                        throw new Error(parsed.error);
-                    }
-                    if (parsed.type === "search_started") {
-                        setIsSearching(true);
-                        setStreamingSearchMetadata({ query: parsed.query, sources: [] });
-                    }
-                    if (parsed.type === "search_completed") {
-                        setIsSearching(false);
-                        setStreamingSearchMetadata(prev => ({ ...prev, sources: parsed.sources }));
-                    }
+                    parsed = JSON.parse(raw);
                 } catch (parseErr) {
                     if (raw && raw !== "[DONE]") {
                         console.warn("Could not parse SSE line:", raw);
                     }
+                    continue;
+                }
+
+                if (parsed.type === "quota") {
+                    setMessageCountToday(parsed.messageCountToday);
+                } else if (parsed.token) {
+                    accumulated += parsed.token;
+                    setStreamingText(accumulated);
+                }
+                if (parsed.error) {
+                    console.error("❌ Stream error from server:", parsed.error);
+                    throw new Error(parsed.error);
+                }
+                if (parsed.type === "search_started") {
+                    setIsSearching(true);
+                    setStreamingSearchMetadata({ query: parsed.query, sources: [] });
+                }
+                if (parsed.type === "search_completed") {
+                    setIsSearching(false);
+                    setStreamingSearchMetadata(prev => ({ ...prev, sources: parsed.sources }));
                 }
             }
         }

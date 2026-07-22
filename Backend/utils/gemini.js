@@ -213,7 +213,7 @@ export const geminiChatStream = async (messageHistory, persona, language, res, m
                 ...formattedMessages,
                 modelMessage,
                 {
-                    role: "user", // For function responses, the role is typically user or function. In Gemini API it uses function or we wrap it in a parts array.
+                    role: "user", 
                     parts: functionResponses
                 }
             ];
@@ -233,7 +233,7 @@ export const geminiChatStream = async (messageHistory, persona, language, res, m
             }
         }
     } catch (e) {
-        console.error("Gemini chat error:", e);
+        console.error("Gemini chat error:", e.message);
         if (res && typeof res.write === "function") {
             res.write(`data: ${JSON.stringify({ error: "Failed to generate response." })}\n\n`);
         }
