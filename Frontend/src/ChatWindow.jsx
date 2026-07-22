@@ -340,9 +340,10 @@ function ChatWindow({ setShowShortcuts }) {
 
         } catch (err) {
             console.error("Chat error:", err);
+            const errorMessage = err.message || "Sorry, something went wrong while processing your request. Please try again.";
             setPrevChats(prev => [...prev, {
                 role: "assistant",
-                content: "⚠️ Sorry, something went wrong while processing your request. Please try again.",
+                content: `⚠️ ${errorMessage}`,
                 timestamp: new Date().toISOString()
             }]);
             setLoading(false);

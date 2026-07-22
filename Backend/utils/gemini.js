@@ -235,7 +235,10 @@ export const geminiChatStream = async (messageHistory, persona, language, res, m
     } catch (e) {
         console.error("Gemini chat error:", e.message);
         if (res && typeof res.write === "function") {
-            res.write(`data: ${JSON.stringify({ error: "Failed to generate response." })}\n\n`);
+            const userFriendlyError = e.message.includes("Quota exceeded") || e.message.includes("429") 
+                ? "API is busy or rate limit reached. Please wait a moment and try again." 
+                : e.message;
+            res.write(`data: ${JSON.stringify({ error: userFriendlyError })}\n\n`);
         }
     }
 
