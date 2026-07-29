@@ -33,10 +33,11 @@
 
 .userMessageWrapper {
     display: flex;
+    justify-content: flex-end;
     align-items: center;
     gap: 4px;
-    width: fit-content;
-    max-width: 100%;
+    width: 100%;
+    max-width: 85%;
 }
 
 .userMessage {
@@ -185,7 +186,7 @@ pre {
 .actionBar {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 0px;
     opacity: 0;
     transition: opacity 0.2s ease;
 }
@@ -210,7 +211,7 @@ pre {
 .action-group {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 0px;
 }
 
 .action-icon-btn {
@@ -220,10 +221,10 @@ pre {
     background: transparent;
     border: none;
     border-radius: 6px;
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
     color: var(--text-secondary);
     opacity: 0.5;
     transition: all 0.15s ease;
