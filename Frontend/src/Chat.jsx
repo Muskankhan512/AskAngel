@@ -338,7 +338,8 @@ function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, stre
                                         </div>
                                     </div>
                                 )}
-                                <div className="gptMeta">
+                            </div>
+                            <div className="gptMeta">
                                     <span className="timestamp">{formatTime(chat.timestamp)}</span>
                                     <div className="actionBar">
                                         <div className="action-group">
@@ -387,7 +388,6 @@ function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, stre
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                         )}
                     </div>
                 ))}
