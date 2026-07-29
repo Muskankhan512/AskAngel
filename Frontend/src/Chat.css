@@ -34,10 +34,11 @@
 .userMessageWrapper {
     display: flex;
     justify-content: flex-end;
-    align-items: center;
+    align-items: flex-end;
     gap: 4px;
     width: 100%;
     max-width: 85%;
+    flex-wrap: wrap-reverse;
 }
 
 .userMessage {
@@ -617,7 +618,7 @@ pre {
 /* Phone */
 @media (max-width: 768px) {
     .chats {
-        padding: 0.75rem 0.5rem;
+        padding: 0.75rem 1rem;
     }
 
     .userMessageWrapper {
