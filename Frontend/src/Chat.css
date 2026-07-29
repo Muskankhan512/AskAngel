@@ -13,13 +13,15 @@
     flex-direction: column;
     align-items: flex-end;
     font-size: 15px;
-    margin-bottom: 32px; /* increased spacing */
+    margin-bottom: 28px;
+    width: 100%;
 }
 
 .gptDiv {
     text-align: left;
     font-size: 15px;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
+    width: 100%;
 }
 
 .userMessageWrapper {
@@ -151,7 +153,12 @@ pre {
     position: relative;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    max-width: 100%;
+    background-color: #1E1E24;
+    padding: 16px 20px;
+    border-radius: 16px;
+    border-bottom-left-radius: 4px;
+    width: fit-content;
+    max-width: 75%;
 }
 
 .actionBar {
@@ -163,6 +170,12 @@ pre {
 }
 
 @media (max-width: 768px) {
+    .gptResponse {
+        max-width: 90%;
+    }
+    .userDiv, .gptDiv {
+        margin-bottom: 20px;
+    }
     .actionBar {
         opacity: 1;
     }
@@ -222,9 +235,8 @@ pre {
 
 /* ── Timestamps ── */
 .timestamp {
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    opacity: 0.6; /* lighter gray */
+    font-size: 11px;
+    color: #8A8A94;
     white-space: nowrap;
     font-weight: 500;
 }
@@ -232,7 +244,7 @@ pre {
 .userTimestamp {
     display: block;
     text-align: right;
-    margin-top: 3px;
+    margin-top: 4px;
 }
 
 /* row holding timestamp + copy button for AI messages */
@@ -240,7 +252,7 @@ pre {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-top: 2px;
+    margin-top: 4px;
 }
 
 /* ── Typing indicator (three bouncing dots) ── */
@@ -288,9 +300,11 @@ pre {
 /* ── Edit Message UI ── */
 .userMessageWrapper {
     display: flex;
+    justify-content: flex-end;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     position: relative;
+    width: 100%;
 }
 
 .editMsgBtn {
