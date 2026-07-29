@@ -184,7 +184,7 @@ pre {
 .actionBar {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
     opacity: 0;
     transition: opacity 0.2s ease;
 }
@@ -209,7 +209,7 @@ pre {
 .action-group {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
 }
 
 .action-icon-btn {
@@ -219,10 +219,10 @@ pre {
     background: transparent;
     border: none;
     border-radius: 6px; /* rounded-square hover */
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
     color: var(--text-secondary);
     opacity: 0.5;
     transition: all 0.15s ease;
@@ -271,8 +271,12 @@ pre {
 .gptMeta {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 8px;
     margin-top: 4px;
+    width: 100%;
+    max-width: 700px;
+    flex-wrap: wrap;
 }
 
 /* ── Typing indicator (three bouncing dots) ── */
