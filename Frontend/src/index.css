@@ -1,12 +1,12 @@
 :root {
-  /* Dark Mode (Default) */
-  --bg-primary: #121212;
-  --bg-secondary: #1a1a1a;
-  --bg-tertiary: #262626;
-  --bg-input: #1e1e1e;
+  /* Dark Mode (Premium Soft) */
+  --bg-primary: #1A1A1F;
+  --bg-secondary: #212127;
+  --bg-tertiary: #2A2A32;
+  --bg-input: #232329;
   --bg-hover: rgba(255, 255, 255, 0.08);
   --bg-hover-strong: rgba(255, 255, 255, 0.12);
-  --bg-dropdown: #242424;
+  --bg-dropdown: #282830;
 
   --text-primary: #f3f4f6;
   --text-secondary: #9ca3af;
