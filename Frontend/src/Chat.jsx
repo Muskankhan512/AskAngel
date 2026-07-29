@@ -312,7 +312,8 @@ function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, stre
                                 <span className="timestamp userTimestamp">{formatTime(chat.timestamp)}</span>
                             </>
                         ) : (
-                            <div className="gptResponse">
+                            <>
+                                <div className="gptResponse">
                                 {chat.searchQuery && (
                                     <div className="searchBadge">
                                         <i className="fa-solid fa-magnifying-glass"></i> Searched the web for "{chat.searchQuery}"
@@ -388,6 +389,7 @@ function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, stre
                                         </div>
                                     </div>
                                 </div>
+                            </>
                         )}
                     </div>
                 ))}
