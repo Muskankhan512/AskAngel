@@ -31,7 +31,7 @@ function CopyButton({ text }) {
         <button className={`action-icon-btn ${copied ? 'activeAction' : ''}`} onClick={handleCopy} title={copied ? "Copied!" : "Copy"}>
             {copied
                 ? <i className="fa-solid fa-check"></i>
-                : <i className="fa-regular fa-copy"></i>
+                : <i className="fa-solid fa-copy"></i>
             }
         </button>
     );
@@ -301,11 +301,11 @@ function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, stre
                                             <i className="fa-solid fa-pencil"></i>
                                         </button>
                                         <button 
-                                            className={`reactionBtn ${chat.isBookmarked ? 'activeLike' : ''}`}
+                                            className={`reactionBtn action-icon-btn ${chat.isBookmarked ? 'activeAction' : ''}`}
                                             onClick={() => handleBookmark(idx)}
                                             title={chat.isBookmarked ? "Remove Bookmark" : "Bookmark"}
                                         >
-                                            <i className={chat.isBookmarked ? "fa-solid fa-bookmark" : "fa-regular fa-bookmark"}></i>
+                                            <i className="fa-solid fa-bookmark"></i>
                                         </button>
                                     </div>
                                 )}
@@ -358,14 +358,14 @@ function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, stre
                                                 onClick={() => handleReaction(idx, 'like')}
                                                 title="Good response"
                                             >
-                                                <i className="fa-regular fa-thumbs-up"></i>
+                                                <i className="fa-solid fa-thumbs-up"></i>
                                             </button>
                                             <button 
                                                 className={`action-icon-btn ${chat.reaction === 'dislike' ? 'activeActionBad' : ''}`}
                                                 onClick={() => handleReaction(idx, 'dislike')}
                                                 title="Bad response"
                                             >
-                                                <i className="fa-regular fa-thumbs-down"></i>
+                                                <i className="fa-solid fa-thumbs-down"></i>
                                             </button>
                                         </div>
 
@@ -382,7 +382,7 @@ function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, stre
                                                 onClick={() => handleBookmark(idx)}
                                                 title={chat.isBookmarked ? "Remove Bookmark" : "Bookmark"}
                                             >
-                                                <i className={chat.isBookmarked ? "fa-solid fa-bookmark" : "fa-regular fa-bookmark"}></i>
+                                                <i className="fa-solid fa-bookmark"></i>
                                             </button>
                                         </div>
                                     </div>

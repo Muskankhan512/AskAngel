@@ -263,7 +263,7 @@ function Sidebar() {
                 // This is a folder list
                 return (
                     <div className="emptyState" style={{ padding: '12px 16px' }}>
-                        <i className="fa-regular fa-folder-open"></i>
+                        <i className="fa-solid fa-folder-open"></i>
                         <p>This folder is empty. Move a chat here to organize it.</p>
                     </div>
                 );

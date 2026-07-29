@@ -59,7 +59,7 @@ function BookmarksModal({ isOpen, onClose }) {
                         </div>
                     ) : bookmarks.length === 0 ? (
                         <div className="noBookmarks">
-                            <i className="fa-regular fa-bookmark"></i>
+                            <i className="fa-solid fa-bookmark"></i>
                             <p>No bookmarks yet. Tap the bookmark icon on any message to save it here.</p>
                         </div>
                     ) : (

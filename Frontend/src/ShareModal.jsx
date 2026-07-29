@@ -29,7 +29,7 @@ function ShareModal({ isOpen, onClose, shareId, onRevoke }) {
                     <div className="share-link-box">
                         <input type="text" readOnly value={shareLink} />
                         <button className="copy-btn" onClick={handleCopy}>
-                            {copied ? <i className="fa-solid fa-check"></i> : <i className="fa-regular fa-copy"></i>}
+                            {copied ? <i className="fa-solid fa-check"></i> : <i className="fa-solid fa-copy"></i>}
                         </button>
                     </div>
                 </div>

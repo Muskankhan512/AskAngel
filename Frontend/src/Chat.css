@@ -8,6 +8,11 @@
     padding: 2rem 4%;
 }
 
+@keyframes messageSlideIn {
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
 .userDiv {
     display: flex;
     flex-direction: column;
@@ -15,6 +20,7 @@
     font-size: 15px;
     margin-bottom: 28px;
     width: 100%;
+    animation: messageSlideIn 0.2s ease-out forwards;
 }
 
 .gptDiv {
@@ -22,6 +28,7 @@
     font-size: 15px;
     margin-bottom: 28px;
     width: 100%;
+    animation: messageSlideIn 0.2s ease-out forwards;
 }
 
 .userMessageWrapper {
@@ -43,7 +50,7 @@
     max-width: 100%;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
 .hljs {
@@ -158,7 +165,8 @@ pre {
     border-radius: 16px;
     border-bottom-left-radius: 4px;
     width: fit-content;
-    max-width: 75%;
+    max-width: 700px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
 .actionBar {
