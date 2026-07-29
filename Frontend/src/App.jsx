@@ -30,7 +30,7 @@ function App() {
   const [streamingText, setStreamingText] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
 
-  const [language, setLanguage] = useState(localStorage.getItem("language") || "en");
+  const [language, setLanguage] = useState(localStorage.getItem("language") || "auto");
   const [persona, setPersona] = useState("Default Assistant");
   const [model, setModel] = useState(() => {
     const saved = localStorage.getItem("model");

@@ -95,8 +95,16 @@ export const geminiChatStream = async (messageHistory, persona, language, res, m
 - Keep paragraphs concise. Avoid walls of text.`;
 
     const targetPersona = personaMap[persona] || personaMap["Default Assistant"];
+    
+    let languageInstruction = "";
+    if (language && language !== 'auto' && langMap[language]) {
+        languageInstruction = `Respond primarily in ${langMap[language]}, but ALWAYS respect the user's explicit instructions if they ask you to speak in a different language (e.g., 'reply in Hinglish' or 'speak in Hindi').`;
+    } else {
+        languageInstruction = `Match the language and style of the user's prompt (e.g. if they write in Hinglish, reply in Hinglish. If they write in Hindi, reply in Hindi. If English, reply in English). ALWAYS respect the user's explicit language requests.`;
+    }
+
     const systemPrompt = `${targetPersona}${markdownInstructions}
-Always respond in ${targetLang}, regardless of what language the user writes in.
+${languageInstruction}
 
 IMPORTANT INSTRUCTION FOR TOOL USAGE:
 1. ONLY use the web_search tool if the user explicitly asks a question requiring real-time information or facts you do not know. DO NOT use the web_search tool for casual conversational messages.

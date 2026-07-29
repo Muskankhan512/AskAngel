@@ -93,6 +93,7 @@ function ChatWindow({ setShowShortcuts }) {
     ];
 
     const langOptions = [
+        { code: 'auto', label: 'Auto (Match User)' },
         { code: 'en', label: 'English' },
         { code: 'as', label: 'অসমীয়া' }, // Assamese
         { code: 'bn', label: 'বাংলা' }, // Bengali

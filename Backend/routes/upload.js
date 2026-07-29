@@ -66,7 +66,15 @@ router.post("/", upload.single("file"), async (req, res) => {
             "Doctor Advisor": "You are a knowledgeable health information assistant. Provide general health information but always remind the user to consult a real doctor for diagnosis or treatment."
         };
         const targetPersona = personaMap[persona] || personaMap["Default Assistant"];
-        const systemPrompt = `${targetPersona}\nAlways respond in ${targetLang}, regardless of what language the user writes in.`;
+        
+        let languageInstruction = "";
+        if (language && language !== 'auto' && langMap[language]) {
+            languageInstruction = `Respond primarily in ${langMap[language]}, but ALWAYS respect the user's explicit instructions if they ask you to speak in a different language (e.g., 'reply in Hinglish' or 'speak in Hindi').`;
+        } else {
+            languageInstruction = `Match the language and style of the user's prompt (e.g. if they write in Hinglish, reply in Hinglish. If they write in Hindi, reply in Hindi. If English, reply in English). ALWAYS respect the user's explicit language requests.`;
+        }
+
+        const systemPrompt = `${targetPersona}\n${languageInstruction}`;
 
         let formattedMessages = [];
         let modelOptions = {
