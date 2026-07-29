@@ -13,10 +13,11 @@
     background-color: var(--bg-primary, #212121);
     color: var(--text-primary, #f0f0f0);
     border-radius: 8px;
-    width: 400px;
-    max-width: 90%;
+    width: 90%;
+    max-width: 400px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    overflow: hidden;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 .shortcuts-header {

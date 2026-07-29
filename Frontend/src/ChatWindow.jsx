@@ -576,7 +576,7 @@ function ChatWindow({ setShowShortcuts }) {
                         <i className="fa-solid fa-brain"></i> {model === "gemini-pro-latest" ? "Gemini Pro" : model === "gemini-flash-latest" ? "Gemini Flash" : "Gemini Flash Lite"}
                         
                         {isModelOpen && (
-                            <div className="dropDown" style={{ top: '45px', right: '0', minWidth: '180px' }}>
+                            <div className="dropDown hide-on-mobile" style={{ top: '45px', right: '0', minWidth: '180px' }}>
                                 {[
                                     { id: "gemini-pro-latest", name: "Gemini Pro (Best Quality)" },
                                     { id: "gemini-flash-latest", name: "Gemini Flash (Fast)" },
@@ -606,7 +606,7 @@ function ChatWindow({ setShowShortcuts }) {
                     >
                         {persona} <i className="fa-solid fa-caret-down" style={{fontSize: '0.8rem'}}></i>
                         {isPersonaOpen && (
-                            <div className="dropDown" style={{top: '45px', right: '0', minWidth: '150px'}}>
+                            <div className="dropDown hide-on-mobile" style={{top: '45px', right: '0', minWidth: '150px'}}>
                                 {personaOptions.map(p => (
                                     <div 
                                         key={p} 
@@ -632,7 +632,7 @@ function ChatWindow({ setShowShortcuts }) {
                     >
                         {langOptions.find(l => l.code === language)?.label || 'Language'} <i className="fa-solid fa-caret-down" style={{fontSize: '0.8rem'}}></i>
                         {isLangOpen && (
-                            <div className="dropDown" style={{top: '45px', right: '0', minWidth: '100px'}}>
+                            <div className="dropDown hide-on-mobile" style={{top: '45px', right: '0', minWidth: '100px'}}>
                                 {langOptions.map(option => (
                                     <div 
                                         key={option.code} 
@@ -739,6 +739,68 @@ function ChatWindow({ setShowShortcuts }) {
                         <span className="userIcon">
                             {user?.avatar ? <img src={user.avatar} alt="avatar" style={{width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover'}} /> : <i className="fa-solid fa-user"></i>}
                         </span>
+                    </div>
+
+                    {/* Mobile Only: Render Dropdowns outside hidden containers */}
+                    <div className="show-on-mobile" style={{ position: 'absolute', right: '0', top: '4.5rem', width: '100%', zIndex: 1000, display: 'flex', justifyContent: 'flex-end', paddingRight: '1rem', pointerEvents: 'none' }}>
+                        {isModelOpen && (
+                            <div className="dropDown" style={{ position: 'relative', top: 0, right: 0, minWidth: '200px', pointerEvents: 'auto' }}>
+                                {[
+                                    { id: "gemini-pro-latest", name: "Gemini Pro (Best Quality)" },
+                                    { id: "gemini-flash-latest", name: "Gemini Flash (Fast)" },
+                                    { id: "gemini-flash-lite-latest", name: "Gemini Flash Lite (Fastest)" }
+                                ].map((m) => (
+                                    <div 
+                                        key={m.id}
+                                        className="dropDownItem" 
+                                        style={{ backgroundColor: model === m.id ? 'var(--bg-hover)' : 'transparent', color: model === m.id ? 'var(--accent-color)' : 'var(--text-primary)' }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setModel(m.id);
+                                            setIsModelOpen(false);
+                                        }}
+                                    >
+                                        <i className="fa-solid fa-microchip menuIcon"></i> {m.name}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {isPersonaOpen && (
+                            <div className="dropDown" style={{ position: 'relative', top: 0, right: 0, minWidth: '150px', pointerEvents: 'auto' }}>
+                                {personaOptions.map(p => (
+                                    <div 
+                                        key={p} 
+                                        className="dropDownItem" 
+                                        style={{ fontWeight: persona === p ? 'bold' : 'normal' }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setPersona(p);
+                                            setIsPersonaOpen(false);
+                                        }}
+                                    >
+                                        {p}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {isLangOpen && (
+                            <div className="dropDown" style={{ position: 'relative', top: 0, right: 0, minWidth: '150px', pointerEvents: 'auto' }}>
+                                {langOptions.map(option => (
+                                    <div 
+                                        key={option.code} 
+                                        className="dropDownItem" 
+                                        style={{ fontWeight: language === option.code ? 'bold' : 'normal' }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setLanguage(option.code);
+                                            setIsLangOpen(false);
+                                        }}
+                                    >
+                                        {option.label}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

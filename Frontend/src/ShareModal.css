@@ -13,10 +13,11 @@
     background-color: var(--bg-primary, #212121);
     color: var(--text-primary, #f0f0f0);
     border-radius: 12px;
-    width: 450px;
-    max-width: 90%;
+    width: 90%;
+    max-width: 450px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    overflow: hidden;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
     animation: popIn 0.2s ease-out;
 }
 

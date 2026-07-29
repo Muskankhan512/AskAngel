@@ -3,6 +3,7 @@
     width: 100%;
     height: 100%;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 2rem 1rem;
 }
 
@@ -35,7 +36,9 @@
     border-bottom-right-radius: 4px;
     margin: 0;
     width: fit-content;
+    max-width: 100%;
     word-wrap: break-word;
+    overflow-wrap: break-word;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
@@ -144,6 +147,9 @@ pre {
 /* AI response wrapper with copy button */
 .gptResponse {
     position: relative;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
 }
 
 .copyBtn, .regenerateBtn, .reactionBtn {

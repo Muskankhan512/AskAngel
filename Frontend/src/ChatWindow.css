@@ -30,6 +30,8 @@
     align-items: center;
     gap: 8px;
     cursor: pointer;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .navbarControls {
@@ -192,6 +194,7 @@ input:focus {
     max-height: 60vh;
     overflow-y: auto;
     overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 .dropDownItem {
@@ -204,6 +207,8 @@ input:focus {
     align-items: center;
     color: var(--text-primary);
     transition: var(--transition);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .dropDownItem:hover {
