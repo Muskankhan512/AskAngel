@@ -28,7 +28,7 @@ function CopyButton({ text }) {
     };
 
     return (
-        <button className="copyBtn" onClick={handleCopy} title="Copy response">
+        <button className={`action-icon-btn ${copied ? 'activeAction' : ''}`} onClick={handleCopy} title={copied ? "Copied!" : "Copy"}>
             {copied
                 ? <i className="fa-solid fa-check"></i>
                 : <i className="fa-regular fa-copy"></i>
@@ -340,42 +340,52 @@ function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, stre
                                 )}
                                 <div className="gptMeta">
                                     <span className="timestamp">{formatTime(chat.timestamp)}</span>
-                                    <CopyButton text={chat.content} />
-                                    <button
-                                        className={`reactionBtn ${speakingIdx === idx ? 'activeLike' : ''}`}
-                                        onClick={() => speakText(chat.content, idx)}
-                                        title={speakingIdx === idx ? 'Stop speaking' : 'Read aloud'}
-                                    >
-                                        <i className={`fa-solid ${speakingIdx === idx ? 'fa-volume-xmark' : 'fa-volume-high'}`}></i>
-                                    </button>
-                                    <button 
-                                        className={`reactionBtn ${chat.reaction === 'like' ? 'activeLike' : ''}`}
-                                        onClick={() => handleReaction(idx, 'like')}
-                                        title="Like"
-                                    >
-                                        <i className="fa-solid fa-thumbs-up"></i>
-                                    </button>
-                                    <button 
-                                        className={`reactionBtn ${chat.reaction === 'dislike' ? 'activeDislike' : ''}`}
-                                        onClick={() => handleReaction(idx, 'dislike')}
-                                        title="Dislike"
-                                    >
-                                        <i className="fa-solid fa-thumbs-down"></i>
-                                    </button>
-                                    <button 
-                                        className="regenerateBtn" 
-                                        onClick={() => onRegenerate(idx)} 
-                                        title="Regenerate response"
-                                    >
-                                        <i className="fa-solid fa-rotate-right"></i>
-                                    </button>
-                                    <button 
-                                        className={`reactionBtn ${chat.isBookmarked ? 'activeLike' : ''}`}
-                                        onClick={() => handleBookmark(idx)}
-                                        title={chat.isBookmarked ? "Remove Bookmark" : "Bookmark"}
-                                    >
-                                        <i className={chat.isBookmarked ? "fa-solid fa-bookmark" : "fa-regular fa-bookmark"}></i>
-                                    </button>
+                                    <div className="actionBar">
+                                        <div className="action-group">
+                                            <CopyButton text={chat.content} />
+                                            <button
+                                                className={`action-icon-btn ${speakingIdx === idx ? 'activeAction' : ''}`}
+                                                onClick={() => speakText(chat.content, idx)}
+                                                title={speakingIdx === idx ? 'Stop speaking' : 'Read aloud'}
+                                            >
+                                                <i className={`fa-solid ${speakingIdx === idx ? 'fa-volume-xmark' : 'fa-volume-high'}`}></i>
+                                            </button>
+                                        </div>
+
+                                        <div className="action-group">
+                                            <button 
+                                                className={`action-icon-btn ${chat.reaction === 'like' ? 'activeAction' : ''}`}
+                                                onClick={() => handleReaction(idx, 'like')}
+                                                title="Good response"
+                                            >
+                                                <i className="fa-regular fa-thumbs-up"></i>
+                                            </button>
+                                            <button 
+                                                className={`action-icon-btn ${chat.reaction === 'dislike' ? 'activeActionBad' : ''}`}
+                                                onClick={() => handleReaction(idx, 'dislike')}
+                                                title="Bad response"
+                                            >
+                                                <i className="fa-regular fa-thumbs-down"></i>
+                                            </button>
+                                        </div>
+
+                                        <div className="action-group">
+                                            <button 
+                                                className="action-icon-btn" 
+                                                onClick={() => onRegenerate(idx)} 
+                                                title="Regenerate"
+                                            >
+                                                <i className="fa-solid fa-rotate-right"></i>
+                                            </button>
+                                            <button 
+                                                className={`action-icon-btn ${chat.isBookmarked ? 'activeAction' : ''}`}
+                                                onClick={() => handleBookmark(idx)}
+                                                title={chat.isBookmarked ? "Remove Bookmark" : "Bookmark"}
+                                            >
+                                                <i className={chat.isBookmarked ? "fa-solid fa-bookmark" : "fa-regular fa-bookmark"}></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         )}

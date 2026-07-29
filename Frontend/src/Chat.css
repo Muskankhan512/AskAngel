@@ -152,56 +152,70 @@ pre {
     max-width: 100%;
 }
 
-.copyBtn, .regenerateBtn, .reactionBtn {
+.actionBar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+@media (max-width: 768px) {
+    .actionBar {
+        opacity: 1;
+    }
+}
+
+.gptDiv:hover .actionBar,
+.actionBar:focus-within {
+    opacity: 1;
+}
+
+.action-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.action-icon-btn {
     display: flex;
     align-items: center;
     justify-content: center;
     background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 6px 10px;
+    border: none;
+    border-radius: 6px; /* rounded-square hover */
+    width: 28px;
+    height: 28px;
     cursor: pointer;
-    font-size: 0.75rem;
-    opacity: 0;
-    margin-top: 4px;
-    transition: all 0.15s ease;
+    font-size: 0.9rem;
     color: var(--text-secondary);
-    transform: translateY(0);
+    opacity: 0.7;
+    transition: all 0.15s ease;
 }
 
-.copyBtn i, .regenerateBtn i, .reactionBtn i {
+.action-icon-btn i {
     pointer-events: none;
 }
 
-.gptDiv:hover .copyBtn,
-.copyBtn:focus,
-.gptDiv:hover .regenerateBtn,
-.regenerateBtn:focus,
-.gptDiv:hover .reactionBtn,
-.reactionBtn:focus {
+.action-icon-btn:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
     opacity: 1;
 }
 
-.copyBtn:hover, .regenerateBtn:hover, .reactionBtn:hover {
-    background-color: var(--bg-hover-strong);
-    color: var(--text-primary);
-    transform: translateY(-1px);
-    border-color: var(--accent-color);
+/* active states */
+.action-icon-btn.activeAction {
+    color: var(--accent-color) !important;
+    opacity: 1 !important;
 }
 
-/* checkmark turns green */
-.copyBtn .fa-check {
-    color: #22c55e !important;
-}
-
-/* active reaction colors */
-.reactionBtn.activeLike {
-    opacity: 1 !important;
-    color: #3b82f6 !important;
-}
-.reactionBtn.activeDislike {
-    opacity: 1 !important;
+.action-icon-btn.activeActionBad {
     color: #ef4444 !important;
+    opacity: 1 !important;
+}
+
+.action-icon-btn .fa-check {
+    color: #22c55e !important;
 }
 
 /* ── Timestamps ── */
