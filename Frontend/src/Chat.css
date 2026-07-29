@@ -331,30 +331,20 @@ pre {
     width: 100%;
 }
 
-.editMsgBtn {
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
+.userMessageWrapper .action-group {
     opacity: 0;
-    transition: all 0.15s ease;
-    font-size: 0.9rem;
-    padding: 4px 6px;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    transition: opacity 0.2s ease;
 }
 
-.userMessageWrapper:hover .editMsgBtn {
+.userDiv:hover .action-group,
+.action-group:focus-within {
     opacity: 1;
 }
 
-.editMsgBtn:hover {
-    color: var(--text-primary);
-    background-color: var(--bg-hover-strong);
+@media (max-width: 768px) {
+    .userMessageWrapper .action-group {
+        opacity: 1;
+    }
 }
 
 .editMessageContainer {

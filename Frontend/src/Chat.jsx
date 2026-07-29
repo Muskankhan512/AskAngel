@@ -289,24 +289,26 @@ function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, stre
                                     </div>
                                 ) : (
                                     <div className="userMessageWrapper">
+                                        <div className="action-group">
+                                            <button 
+                                                className="action-icon-btn"
+                                                onClick={() => {
+                                                    setEditingIndex(idx);
+                                                    setEditValue(chat.content);
+                                                }}
+                                                title="Edit Message"
+                                            >
+                                                <i className="fa-solid fa-pencil"></i>
+                                            </button>
+                                            <button 
+                                                className={`action-icon-btn ${chat.isBookmarked ? 'activeAction' : ''}`}
+                                                onClick={() => handleBookmark(idx)}
+                                                title={chat.isBookmarked ? "Remove Bookmark" : "Bookmark"}
+                                            >
+                                                <i className="fa-solid fa-bookmark"></i>
+                                            </button>
+                                        </div>
                                         {chat.content && <p className="userMessage">{chat.content}</p>}
-                                        <button 
-                                            className="editMsgBtn"
-                                            onClick={() => {
-                                                setEditingIndex(idx);
-                                                setEditValue(chat.content);
-                                            }}
-                                            title="Edit Message"
-                                        >
-                                            <i className="fa-solid fa-pencil"></i>
-                                        </button>
-                                        <button 
-                                            className={`reactionBtn action-icon-btn ${chat.isBookmarked ? 'activeAction' : ''}`}
-                                            onClick={() => handleBookmark(idx)}
-                                            title={chat.isBookmarked ? "Remove Bookmark" : "Bookmark"}
-                                        >
-                                            <i className="fa-solid fa-bookmark"></i>
-                                        </button>
                                     </div>
                                 )}
                                 <span className="timestamp userTimestamp">{formatTime(chat.timestamp)}</span>
