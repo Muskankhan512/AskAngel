@@ -65,7 +65,7 @@ async function executeWebSearch(query) {
     }
 }
 
-export const geminiChatStream = async (messageHistory, persona, language, res, model = "gemini-flash-latest") => {
+export const geminiChatStream = async (messageHistory, persona, language, res, model = "gemini-2.0-flash") => {
     const langMap = {
         'en': 'English',
         'hi': 'pure, natural Hindi (Devanagari script)',
@@ -113,6 +113,10 @@ IMPORTANT INSTRUCTION FOR TOOL USAGE:
             parts: parts
         };
     }).filter(m => m.role !== "system"); // Filter out system messages just in case
+
+    console.log(`\n======================================================`);
+    console.log(`[geminiChatStream] Using Gemini model for this request: ${model}`);
+    console.log(`======================================================\n`);
 
     const modelInstance = genAI.getGenerativeModel({ 
         model: model,
@@ -307,9 +311,7 @@ IMPORTANT INSTRUCTION FOR TOOL USAGE:
     } catch (e) {
         console.error("Gemini chat error:", e.message);
         if (res && typeof res.write === "function") {
-            const userFriendlyError = e.message.includes("Quota exceeded") || e.message.includes("429") 
-                ? "Gemini API rate limit reached. Please wait a moment and try again." 
-                : e.message;
+            const userFriendlyError = "AskAngel is experiencing high demand right now. Please wait a moment and try again.";
             res.write(`data: ${JSON.stringify({ error: userFriendlyError })}\n\n`);
         }
     }
@@ -319,7 +321,7 @@ IMPORTANT INSTRUCTION FOR TOOL USAGE:
 
 export const generateTitle = async (message) => {
     try {
-        const modelInstance = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const modelInstance = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
         const response = await modelInstance.generateContent({
             contents: [{ role: "user", parts: [{ text: message }] }],
             systemInstruction: "You are a title generator. Generate a very short, smart title (3 to 6 words maximum) summarizing the user's prompt. Do not use quotes around the title. Do not provide any conversational text or formatting."

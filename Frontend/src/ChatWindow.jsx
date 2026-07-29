@@ -196,67 +196,77 @@ function ChatWindow({ setShowShortcuts }) {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let accumulated = "";
+        let buffer = "";
 
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
 
-            const chunk = decoder.decode(value, { stream: true });
-            const lines = chunk.split("\n").filter(l => l.startsWith("data: "));
+            buffer += decoder.decode(value, { stream: true });
+            const parts = buffer.split("\n\n");
+            
+            // The last part is incomplete, keep it in the buffer
+            buffer = parts.pop();
 
-            for (const line of lines) {
-                const raw = line.slice(6).trim();
-                if (raw === "[DONE]") {
-                    const assistantEntry = {
-                        role: "assistant",
-                        content: accumulated,
-                        timestamp: new Date().toISOString()
-                    };
+            for (const chunk of parts) {
+                const lines = chunk.split("\n");
+                for (const line of lines) {
+                    if (!line.startsWith("data: ")) continue;
                     
-                    // Attach search metadata if it exists
-                    setStreamingSearchMetadata(currentMeta => {
-                        if (currentMeta) {
-                            assistantEntry.searchQuery = currentMeta.query;
-                            assistantEntry.searchSources = currentMeta.sources;
-                        }
-                        return currentMeta;
-                    });
+                    const raw = line.slice(6).trim();
+                    if (raw === "[DONE]") {
+                        const assistantEntry = {
+                            role: "assistant",
+                            content: accumulated,
+                            timestamp: new Date().toISOString()
+                        };
+                        
+                        // Attach search metadata if it exists
+                        setStreamingSearchMetadata(currentMeta => {
+                            if (currentMeta) {
+                                assistantEntry.searchQuery = currentMeta.query;
+                                assistantEntry.searchSources = currentMeta.sources;
+                            }
+                            return currentMeta;
+                        });
 
-                    setPrevChats(prev => [...prev, assistantEntry]);
-                    setStreamingText("");
-                    setIsStreaming(false);
-                    setIsSearching(false);
-                    setStreamingSearchMetadata(null);
-                    playDing();
-                    return;
-                }
-                let parsed;
-                try {
-                    parsed = JSON.parse(raw);
-                } catch (parseErr) {
-                    if (raw && raw !== "[DONE]") {
-                        console.warn("Could not parse SSE line:", raw);
+                        setPrevChats(prev => [...prev, assistantEntry]);
+                        setStreamingText("");
+                        setIsStreaming(false);
+                        setIsSearching(false);
+                        setStreamingSearchMetadata(null);
+                        playDing();
+                        return;
                     }
-                    continue;
-                }
+                    
+                    let parsed;
+                    try {
+                        parsed = JSON.parse(raw);
+                    } catch (parseErr) {
+                        if (raw && raw !== "[DONE]") {
+                            console.warn("Could not parse SSE line:", raw);
+                        }
+                        continue;
+                    }
 
-                if (parsed.type === "quota") {
-                    setMessageCountToday(parsed.messageCountToday);
-                } else if (parsed.token) {
-                    accumulated += parsed.token;
-                    setStreamingText(accumulated);
-                }
-                if (parsed.error) {
-                    console.error("❌ Stream error from server:", parsed.error);
-                    throw new Error(parsed.error);
-                }
-                if (parsed.type === "search_started") {
-                    setIsSearching(true);
-                    setStreamingSearchMetadata({ query: parsed.query, sources: [] });
-                }
-                if (parsed.type === "search_completed") {
-                    setIsSearching(false);
-                    setStreamingSearchMetadata(prev => ({ ...prev, sources: parsed.sources }));
+                    if (parsed.type === "quota") {
+                        setMessageCountToday(parsed.messageCountToday);
+                    } else if (parsed.token) {
+                        accumulated += parsed.token;
+                        setStreamingText(accumulated);
+                    }
+                    if (parsed.error) {
+                        console.error("❌ Stream error from server:", parsed.error);
+                        throw new Error(parsed.error);
+                    }
+                    if (parsed.type === "search_started") {
+                        setIsSearching(true);
+                        setStreamingSearchMetadata({ query: parsed.query, sources: [] });
+                    }
+                    if (parsed.type === "search_completed") {
+                        setIsSearching(false);
+                        setStreamingSearchMetadata(prev => ({ ...prev, sources: parsed.sources }));
+                    }
                 }
             }
         }
@@ -573,14 +583,13 @@ function ChatWindow({ setShowShortcuts }) {
                         onClick={() => { setIsModelOpen(!isModelOpen); setIsPersonaOpen(false); setIsLangOpen(false); setIsOpen(false); setIsMoreMenuOpen(false); }}
                         title="Select Model"
                     >
-                        <i className="fa-solid fa-brain"></i> {model === "gemini-pro-latest" ? "Gemini Pro" : model === "gemini-flash-latest" ? "Gemini Flash" : "Gemini Flash Lite"}
+                        <i className="fa-solid fa-brain"></i> {model === "gemini-2.0-flash" ? "Gemini 2.0 Flash" : "Gemini 2.0 Flash Lite"}
                         
                         {isModelOpen && (
                             <div className="dropDown hide-on-mobile" style={{ top: '45px', right: '0', minWidth: '180px' }}>
                                 {[
-                                    { id: "gemini-pro-latest", name: "Gemini Pro (Best Quality)" },
-                                    { id: "gemini-flash-latest", name: "Gemini Flash (Fast)" },
-                                    { id: "gemini-flash-lite-latest", name: "Gemini Flash Lite (Fastest)" }
+                                    { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash" },
+                                    { id: "gemini-2.0-flash-lite-preview-02-05", name: "Gemini 2.0 Flash Lite" }
                                 ].map((m) => (
                                     <div 
                                         key={m.id}
@@ -746,9 +755,8 @@ function ChatWindow({ setShowShortcuts }) {
                         {isModelOpen && (
                             <div className="dropDown" style={{ position: 'relative', top: 0, right: 0, minWidth: '200px', pointerEvents: 'auto' }}>
                                 {[
-                                    { id: "gemini-pro-latest", name: "Gemini Pro (Best Quality)" },
-                                    { id: "gemini-flash-latest", name: "Gemini Flash (Fast)" },
-                                    { id: "gemini-flash-lite-latest", name: "Gemini Flash Lite (Fastest)" }
+                                    { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash" },
+                                    { id: "gemini-2.0-flash-lite-preview-02-05", name: "Gemini 2.0 Flash Lite" }
                                 ].map((m) => (
                                     <div 
                                         key={m.id}

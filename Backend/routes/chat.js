@@ -106,8 +106,8 @@ router.get("/chat/search", async (req, res) => {
 
 // ── STREAMING chat route using SSE ──
 router.post("/chat", async (req, res) => {
-    let { threadId, message, language, persona = 'Default Assistant', model = "gemini-flash-latest" } = req.body;
-    if (!model || typeof model !== 'string' || !model.includes("gemini")) model = "gemini-flash-latest";
+    let { threadId, message, language, persona = 'Default Assistant', model = "gemini-2.0-flash" } = req.body;
+    if (!model || typeof model !== 'string' || !model.includes("gemini")) model = "gemini-2.0-flash";
     if (!threadId || !message) return res.status(400).json({ error: "Missing required fields" });
 
     try {
@@ -186,15 +186,15 @@ router.post("/chat", async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        res.write(`data: ${JSON.stringify({ error: "Something went wrong" })}\n\n`);
+        res.write(`data: ${JSON.stringify({ error: "AskAngel is experiencing high demand right now. Please wait a moment and try again." })}\n\n`);
         res.end();
     }
 });
 
 // ── EDIT message route ──
 router.put("/chat/edit", async (req, res) => {
-    let { threadId, messageIndex, message, language, persona = 'Default Assistant', model = "gemini-flash-latest" } = req.body;
-    if (!model || typeof model !== 'string' || !model.includes("gemini")) model = "gemini-flash-latest";
+    let { threadId, messageIndex, message, language, persona = 'Default Assistant', model = "gemini-2.0-flash" } = req.body;
+    if (!model || typeof model !== 'string' || !model.includes("gemini")) model = "gemini-2.0-flash";
     if (!threadId || typeof messageIndex !== 'number' || !message) {
         return res.status(400).json({ error: "Missing required fields" });
     }
@@ -256,15 +256,15 @@ router.put("/chat/edit", async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        res.write(`data: ${JSON.stringify({ error: "Something went wrong" })}\n\n`);
+        res.write(`data: ${JSON.stringify({ error: "AskAngel is experiencing high demand right now. Please wait a moment and try again." })}\n\n`);
         res.end();
     }
 });
 
 // ── REGENERATE message route ──
 router.post("/chat/regenerate", async (req, res) => {
-    let { threadId, aiMessageIndex, language, persona = 'Default Assistant', model = "gemini-flash-latest" } = req.body;
-    if (!model || typeof model !== 'string' || !model.includes("gemini")) model = "gemini-flash-latest";
+    let { threadId, aiMessageIndex, language, persona = 'Default Assistant', model = "gemini-2.0-flash" } = req.body;
+    if (!model || typeof model !== 'string' || !model.includes("gemini")) model = "gemini-2.0-flash";
     if (!threadId || typeof aiMessageIndex !== 'number') {
         return res.status(400).json({ error: "Missing required fields" });
     }
@@ -327,7 +327,7 @@ router.post("/chat/regenerate", async (req, res) => {
         res.end();
     } catch (err) {
         console.log(err);
-        res.write(`data: ${JSON.stringify({ error: "Something went wrong" })}\n\n`);
+        res.write(`data: ${JSON.stringify({ error: "AskAngel is experiencing high demand right now. Please wait a moment and try again." })}\n\n`);
         res.end();
     }
 });

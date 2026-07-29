@@ -35,7 +35,7 @@ function App() {
   const [model, setModel] = useState(() => {
     const saved = localStorage.getItem("model");
     if (saved && saved.includes("gemini")) return saved;
-    return "gemini-flash-latest";
+    return "gemini-2.0-flash";
   });
   const [messageCountToday, setMessageCountToday] = useState(0);
 

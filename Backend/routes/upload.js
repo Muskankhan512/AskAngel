@@ -70,7 +70,7 @@ router.post("/", upload.single("file"), async (req, res) => {
 
         let formattedMessages = [];
         let modelOptions = {
-            model: "gemini-flash-latest",
+            model: "gemini-2.0-flash",
             systemInstruction: systemPrompt
         };
 
@@ -93,7 +93,7 @@ router.post("/", upload.single("file"), async (req, res) => {
                     ]
                 }
             ];
-            modelOptions.model = "gemini-pro-latest"; // Better for vision
+            modelOptions.model = "gemini-2.0-flash"; // Flash supports vision well on free tier
         } else if (isPDF) {
             // ── PDF: extract text, send as context ──
             const parsed = await pdfParse(file.buffer);
@@ -156,7 +156,7 @@ router.post("/", upload.single("file"), async (req, res) => {
 
     } catch (err) {
         console.error("Upload route error:", err);
-        res.write(`data: ${JSON.stringify({ error: err.message || "Something went wrong." })}\n\n`);
+        res.write(`data: ${JSON.stringify({ error: "AskAngel is experiencing high demand right now. Please wait a moment and try again." })}\n\n`);
         res.end();
     }
 });
