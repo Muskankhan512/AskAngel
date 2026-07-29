@@ -463,67 +463,12 @@ pre {
 .welcomeTagline {
     font-size: 0.95rem;
     color: var(--text-secondary);
-    margin: 0 0 2.5rem 0;
+    margin: 0;
     opacity: 0.8;
     animation: fadeInUp 0.5s 0.1s ease both;
 }
 
-/* ── Suggestion cards: minimal, border-only ── */
-.suggestionsGrid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    max-width: 600px;
-    width: 100%;
-    padding: 0 10px;
-    animation: fadeInUp 0.5s 0.2s ease both;
-}
 
-.suggestionCard {
-    background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 15px 16px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.suggestionCard:hover {
-    background: rgba(139, 92, 246, 0.06);
-    border-color: rgba(139, 92, 246, 0.4);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-}
-
-.suggestionCard i {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    opacity: 0.7;
-    flex-shrink: 0;
-    transition: color 0.2s ease, opacity 0.2s ease;
-}
-
-.suggestionCard:hover i {
-    color: var(--accent-color);
-    opacity: 1;
-}
-
-.suggestionCard p {
-    font-size: 0.95rem; /* slightly larger for readability */
-    color: #e0e0e0; /* higher contrast than text-secondary */
-    margin: 0;
-    font-weight: 500;
-    line-height: 1.4;
-    transition: color 0.2s ease;
-}
-
-.suggestionCard:hover p {
-    color: #ffffff; /* pure white on hover for pop */
-}
 
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(12px); }
@@ -635,15 +580,7 @@ pre {
         font-size: 0.88rem;
     }
 
-    .suggestionsGrid {
-        grid-template-columns: 1fr;
-        gap: 10px;
-        padding: 0 6px;
-    }
 
-    .suggestionCard {
-        padding: 14px;
-    }
 
     .copyBtn, .regenerateBtn, .reactionBtn {
         opacity: 1;

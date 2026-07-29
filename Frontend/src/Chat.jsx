@@ -224,12 +224,7 @@ function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, stre
         }
     };
 
-    const suggestions = [
-        { icon: "fa-atom", text: "Explain quantum computing simply" },
-        { icon: "fa-water", text: "Write a short poem about the ocean" },
-        { icon: "fa-dumbbell", text: "Help me plan a weekly workout routine" },
-        { icon: "fa-bowl-food", text: "What are some healthy breakfast ideas" }
-    ];
+
 
     return (
         <div className="chatContentWrapper" style={{ flex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', overflow: 'hidden' }}>
@@ -244,15 +239,7 @@ function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, stre
                     <h1 className="greetingHeadline">{getGreeting()}</h1>
                     <p className="welcomeTagline">Ask me anything, I'm here to help.</p>
 
-                    {/* Suggestion cards — minimal, lighter treatment */}
-                    <div className="suggestionsGrid">
-                        {suggestions.map((s, i) => (
-                            <div key={i} className="suggestionCard" onClick={() => onSuggestionClick(s.text)}>
-                                <i className={`fa-solid ${s.icon}`}></i>
-                                <p>{s.text}</p>
-                            </div>
-                        ))}
-                    </div>
+
                 </div>
             ) : (
             <div className="chats">
