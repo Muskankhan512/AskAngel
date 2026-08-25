@@ -3,6 +3,11 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+const logGeminiCall = (model, trigger) => {
+    const timestamp = new Date().toISOString();
+    console.log(`\n[GEMINI_API_CALL] | Timestamp: ${timestamp} | Model: ${model} | Trigger: ${trigger}\n`);
+};
+
 const tools = [
     {
         functionDeclarations: [
@@ -22,7 +27,7 @@ const tools = [
             },
             {
                 name: "generate_image",
-                description: "Generate an AI image based on a prompt. ONLY call this tool if the user EXPLICITLY and CLEARLY requests the creation of an image (e.g., 'generate an image of...', 'create a picture showing...', 'draw a...', 'make an image', 'banao ek image...'). Do NOT call this tool for general conversation, questions, greetings, or casual remarks (like 'kya kar rahe ho', 'how are you', etc.). If unsure, default to a normal text response.",
+                description: "Generate an AI image based on a prompt. ONLY call this tool if the user EXPLICITLY requests the creation of an image. IMPORTANT: Do NOT generate images of real identifiable people (celebrities, politicians, etc.). If the user asks for a real person, do NOT call this tool, and instead reply in chat that you cannot generate images of real people due to privacy. Do NOT call this tool for general conversation. If unsure, default to a normal text response.",
                 parameters: {
                     type: "OBJECT",
                     properties: {
@@ -108,7 +113,7 @@ ${languageInstruction}
 
 IMPORTANT INSTRUCTION FOR TOOL USAGE:
 1. ONLY use the web_search tool if the user explicitly asks a question requiring real-time information or facts you do not know. DO NOT use the web_search tool for casual conversational messages.
-2. YOU CAN GENERATE IMAGES. You have access to the \`generate_image\` tool. If the user asks for a picture, photo, image, drawing, or painting (in any language, including Hindi/Hinglish), you MUST IMMEDIATELY use the \`generate_image\` tool. NEVER say "I cannot copy images from the internet". NEVER ask for permission to generate an image. Just call the tool and let the system handle it.`;
+2. YOU CAN GENERATE IMAGES. You have access to the \`generate_image\` tool. If the user asks for a picture, photo, image, drawing, or painting, use the \`generate_image\` tool. NEVER say "I cannot copy images from the internet". However, you MUST NOT generate images of real identifiable people. If they ask for a real person, refuse in chat and do NOT call the tool.`;
 
     const formattedMessages = messageHistory.map(m => {
         // Handle images in messages if they exist
@@ -137,23 +142,26 @@ IMPORTANT INSTRUCTION FOR TOOL USAGE:
 
     const req = { contents: formattedMessages };
     
-    // Helper to retry API calls on rate limit or 503 errors
+    // Helper to retry API calls on 503 errors only
     const executeWithRetry = async (apiCallFn) => {
         try {
             return await apiCallFn();
         } catch (e) {
-            const isRateLimit = e.message.includes("Quota exceeded") || e.message.includes("429") || e.message.includes("503");
-            if (isRateLimit) {
-                console.log("Gemini API busy or rate limit hit. Retrying in 2.5 seconds...");
+            if (e.message && e.message.includes("503")) {
+                console.log("Gemini API busy (503). Retrying in 2.5 seconds...");
                 await new Promise(resolve => setTimeout(resolve, 2500));
                 return await apiCallFn();
             }
+            // For 429 Rate Limits and other errors, fail immediately.
             throw e;
         }
     };
 
     try {
-        let streamResult = await executeWithRetry(() => modelInstance.generateContentStream(req));
+        let streamResult = await executeWithRetry(() => {
+            logGeminiCall(model, "geminiChatStream - main chat response (initial stream)");
+            return modelInstance.generateContentStream(req);
+        });
         
         let isFunctionCall = false;
         let functionCalls = [];
@@ -200,28 +208,8 @@ IMPORTANT INSTRUCTION FOR TOOL USAGE:
                 } else if (tc.name === "generate_image") {
                     const imgPrompt = tc.args.prompt || "image";
 
-                    // ── SAFETY CHECK FOR REAL PEOPLE ──
-                    const checkModel = genAI.getGenerativeModel({ model: "gemini-flash-lite-latest" });
-                    const checkPrompt = `Does this image generation prompt ask for an image of a real, identifiable person (like a celebrity, public figure, politician, actor, or named individual)? Answer only YES or NO.\nPrompt: "${imgPrompt}"`;
-                    
-                    try {
-                        const checkRes = await checkModel.generateContent(checkPrompt);
-                        const answer = checkRes.response.text().trim().toUpperCase();
-                        
-                        if (answer.includes("YES")) {
-                            const rejectionMsg = `\n\nMain real logon ki tasveer generate nahi kar sakti privacy aur likeness rights ki wajah se. Lekin main iss style ka fictional character bana sakti hoon — batao kaisa look chahiye?\n\n`;
-                            if (res && typeof res.write === "function") {
-                                res.write(`data: ${JSON.stringify({ token: rejectionMsg })}\n\n`);
-                                fullReply += rejectionMsg; // Save to history
-                            }
-                            // Return BLOCKED to the main model so it doesn't hallucinate a success
-                            return { id: tc.id, name: tc.name, query: imgPrompt, results: [{ content: "BLOCKED_REAL_PERSON" }], blocked: true };
-                        }
-                    } catch (e) {
-                        console.error("Safety check failed, defaulting to allow", e);
-                    }
-
-                    // ── IF SAFE, GENERATE URL AND STREAM MARKDOWN ──
+                    // ── GENERATE URL AND STREAM MARKDOWN ──
+                    // Safety check is now handled by the main model's system prompt instructions
                     const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imgPrompt)}?width=1024&height=1024&nologo=true`;
                     const md = `\n\n![${imgPrompt}](${imageUrl})\n\n`;
                     
@@ -302,7 +290,10 @@ IMPORTANT INSTRUCTION FOR TOOL USAGE:
                 }
             ];
 
-            const stream2 = await executeWithRetry(() => modelInstance.generateContentStream({ contents: newContents }));
+            const stream2 = await executeWithRetry(() => {
+                logGeminiCall(model, "geminiChatStream - tool execution response (second stream)");
+                return modelInstance.generateContentStream({ contents: newContents });
+            });
             
             for await (const chunk of stream2.stream) {
                 try {
@@ -329,17 +320,18 @@ IMPORTANT INSTRUCTION FOR TOOL USAGE:
 
 export const generateTitle = async (message) => {
     try {
-        const modelInstance = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-        const response = await modelInstance.generateContent({
-            contents: [{ role: "user", parts: [{ text: message }] }],
-            systemInstruction: "You are a title generator. Generate a very short, smart title (3 to 6 words maximum) summarizing the user's prompt. Do not use quotes around the title. Do not provide any conversational text or formatting."
-        });
+        // Fast, no-API heuristic title generation
+        const limit = 45;
+        if (message.length <= limit) return message;
         
-        let generated = response.response.text().trim() || "";
-        generated = generated.replace(/^["'](.*)["']$/, '$1');
-        return generated || message.slice(0, 60);
+        let truncated = message.slice(0, limit);
+        // Try to trim to the nearest complete word
+        const lastSpace = truncated.lastIndexOf(' ');
+        if (lastSpace > 0) {
+            truncated = truncated.slice(0, lastSpace);
+        }
+        return truncated + "...";
     } catch (err) {
-        console.error("Failed to generate title:", err);
-        return message.slice(0, 60);
+        return message.slice(0, 45) + "...";
     }
 };
