@@ -45,7 +45,6 @@ router.post("/", upload.single("file"), async (req, res) => {
         const isImage = file.mimetype.startsWith("image/");
         const isPDF = file.mimetype === "application/pdf";
 
-        let groqPayload;
         const userQuestion = message?.trim() || (isImage ? "What is in this image?" : "Summarize this document.");
 
         const langMap = {
@@ -78,7 +77,7 @@ router.post("/", upload.single("file"), async (req, res) => {
 
         let formattedMessages = [];
         let modelOptions = {
-            model: "gemini-2.0-flash",
+            model: "gemini-flash-lite-latest",
             systemInstruction: systemPrompt
         };
 
@@ -101,7 +100,7 @@ router.post("/", upload.single("file"), async (req, res) => {
                     ]
                 }
             ];
-            modelOptions.model = "gemini-2.0-flash"; // Flash supports vision well on free tier
+            modelOptions.model = "gemini-flash-lite-latest"; // Flash supports vision well on free tier
         } else if (isPDF) {
             // ── PDF: extract text, send as context ──
             const parsed = await pdfParse(file.buffer);

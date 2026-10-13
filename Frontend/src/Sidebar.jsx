@@ -24,7 +24,7 @@ function Sidebar() {
     const [isSearching, setIsSearching] = useState(false);
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
     const { showToast } = useToast();
-    const t = translations[language];
+    const t = translations[language] || translations.en;
 
     const authHeaders = {
         "Content-Type": "application/json",

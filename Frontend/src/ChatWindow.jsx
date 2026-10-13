@@ -17,7 +17,7 @@ function ChatWindow({ setShowShortcuts }) {
         streamingText, setStreamingText, isStreaming, setIsStreaming,
         language, setLanguage,
         persona, setPersona,
-        model, setModel,
+        model,
         messageCountToday, setMessageCountToday,
         soundEnabled, setSoundEnabled,
         isSidebarOpenMobile, setIsSidebarOpenMobile,
@@ -28,7 +28,7 @@ function ChatWindow({ setShowShortcuts }) {
         currentShareId, setCurrentShareId
     } = useContext(MyContext);
 
-    const t = translations[language];
+    const t = translations[language] || translations.en;
 
     const navRef = useRef(null);
 
@@ -584,27 +584,13 @@ function ChatWindow({ setShowShortcuts }) {
                         onClick={() => { setIsModelOpen(!isModelOpen); setIsPersonaOpen(false); setIsLangOpen(false); setIsOpen(false); setIsMoreMenuOpen(false); }}
                         title="Select Model"
                     >
-                        <i className="fa-solid fa-brain"></i> {model === "gemini-2.0-flash" ? "Gemini 2.0 Flash" : "Gemini 2.0 Flash Lite"}
+                        <i className="fa-solid fa-brain"></i> Gemini Flash Lite
                         
                         {isModelOpen && (
                             <div className="dropDown hide-on-mobile" style={{ top: '45px', right: '0', minWidth: '180px' }}>
-                                {[
-                                    { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash" },
-                                    { id: "gemini-2.0-flash-lite-preview-02-05", name: "Gemini 2.0 Flash Lite" }
-                                ].map((m) => (
-                                    <div 
-                                        key={m.id}
-                                        className="dropDownItem" 
-                                        style={{ backgroundColor: model === m.id ? 'var(--bg-hover)' : 'transparent', color: model === m.id ? 'var(--accent-color)' : 'var(--text-primary)' }}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setModel(m.id);
-                                            setIsModelOpen(false);
-                                        }}
-                                    >
-                                        <i className="fa-solid fa-microchip menuIcon"></i> {m.name}
-                                    </div>
-                                ))}
+                                <div className="dropDownItem" style={{ color: 'var(--accent-color)' }}>
+                                    <i className="fa-solid fa-microchip menuIcon"></i> Gemini Flash Lite
+                                </div>
                             </div>
                         )}
                     </div>
@@ -688,9 +674,6 @@ function ChatWindow({ setShowShortcuts }) {
                                 <div className="dropDownItem hide-on-desktop" onClick={(e) => { e.stopPropagation(); setIsBookmarksOpen(true); setIsMoreMenuOpen(false); }}>
                                     <i className="fa-solid fa-bookmark menuIcon"></i> Bookmarks
                                 </div>
-                                <div className="dropDownItem hide-on-desktop" onClick={(e) => { e.stopPropagation(); setIsModelOpen(true); setIsMoreMenuOpen(false); }}>
-                                    <i className="fa-solid fa-brain menuIcon"></i> Change Model
-                                </div>
                                 <div className="dropDownItem hide-on-desktop" onClick={(e) => { e.stopPropagation(); setIsPersonaOpen(true); setIsMoreMenuOpen(false); }}>
                                     <i className="fa-solid fa-user-astronaut menuIcon"></i> Change Persona
                                 </div>
@@ -755,23 +738,9 @@ function ChatWindow({ setShowShortcuts }) {
                     <div className="show-on-mobile" style={{ position: 'absolute', right: '0', top: '4.5rem', width: '100%', zIndex: 1000, display: 'flex', justifyContent: 'flex-end', paddingRight: '1rem', pointerEvents: 'none' }}>
                         {isModelOpen && (
                             <div className="dropDown" style={{ position: 'relative', top: 0, right: 0, minWidth: '200px', pointerEvents: 'auto' }}>
-                                {[
-                                    { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash" },
-                                    { id: "gemini-2.0-flash-lite-preview-02-05", name: "Gemini 2.0 Flash Lite" }
-                                ].map((m) => (
-                                    <div 
-                                        key={m.id}
-                                        className="dropDownItem" 
-                                        style={{ backgroundColor: model === m.id ? 'var(--bg-hover)' : 'transparent', color: model === m.id ? 'var(--accent-color)' : 'var(--text-primary)' }}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setModel(m.id);
-                                            setIsModelOpen(false);
-                                        }}
-                                    >
-                                        <i className="fa-solid fa-microchip menuIcon"></i> {m.name}
-                                    </div>
-                                ))}
+                                <div className="dropDownItem" style={{ color: 'var(--accent-color)' }}>
+                                    <i className="fa-solid fa-microchip menuIcon"></i> Gemini Flash Lite
+                                </div>
                             </div>
                         )}
                         {isPersonaOpen && (

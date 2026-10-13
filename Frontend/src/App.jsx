@@ -32,11 +32,7 @@ function App() {
 
   const [language, setLanguage] = useState(localStorage.getItem("language") || "auto");
   const [persona, setPersona] = useState("Default Assistant");
-  const [model, setModel] = useState(() => {
-    const saved = localStorage.getItem("model");
-    if (saved && saved.includes("gemini")) return saved;
-    return "gemini-2.0-flash";
-  });
+  const model = "gemini-flash-lite-latest";
   const [messageCountToday, setMessageCountToday] = useState(0);
 
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -85,10 +81,6 @@ function App() {
   useEffect(() => {
     localStorage.setItem("soundEnabled", soundEnabled);
   }, [soundEnabled]);
-
-  useEffect(() => {
-    localStorage.setItem("model", model);
-  }, [model]);
 
   // Load draft when thread changes
   useEffect(() => {
@@ -171,7 +163,7 @@ function App() {
     handleLogout,
     language, setLanguage,
     persona, setPersona,
-    model, setModel,
+    model,
     messageCountToday, setMessageCountToday,
     soundEnabled, setSoundEnabled,
     isSidebarOpenMobile, setIsSidebarOpenMobile,

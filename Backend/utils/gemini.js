@@ -8,6 +8,11 @@ const logGeminiCall = (model, trigger) => {
     console.log(`\n[GEMINI_API_CALL] | Timestamp: ${timestamp} | Model: ${model} | Trigger: ${trigger}\n`);
 };
 
+const withTimeout = (promise, milliseconds) => Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error("Gemini request timed out")), milliseconds))
+]);
+
 const tools = [
     {
         functionDeclarations: [
@@ -70,7 +75,7 @@ async function executeWebSearch(query) {
     }
 }
 
-export const geminiChatStream = async (messageHistory, persona, language, res, model = "gemini-2.0-flash") => {
+export const geminiChatStream = async (messageHistory, persona, language, res, model = "gemini-flash-lite-latest") => {
     const langMap = {
         'en': 'English',
         'hi': 'pure, natural Hindi (Devanagari script)',
@@ -133,8 +138,7 @@ IMPORTANT INSTRUCTION FOR TOOL USAGE:
 
     const modelInstance = genAI.getGenerativeModel({ 
         model: model,
-        systemInstruction: systemPrompt,
-        tools: tools
+        systemInstruction: systemPrompt
     });
 
     let fullReply = "";
@@ -158,159 +162,22 @@ IMPORTANT INSTRUCTION FOR TOOL USAGE:
     };
 
     try {
-        let streamResult = await executeWithRetry(() => {
-            logGeminiCall(model, "geminiChatStream - main chat response (initial stream)");
-            return modelInstance.generateContentStream(req);
-        });
-        
-        let isFunctionCall = false;
-        let functionCalls = [];
-
-        // Try streaming first
-        for await (const chunk of streamResult.stream) {
-            const calls = chunk.functionCalls();
-            if (calls && calls.length > 0) {
-                isFunctionCall = true;
-                functionCalls = functionCalls.concat(calls);
-                break; // Stop streaming text, we need to handle the function
-            }
-            try {
-                const text = chunk.text();
-                if (text) {
-                    fullReply += text;
-                    if (res && typeof res.write === "function") {
-                        res.write(`data: ${JSON.stringify({ token: text })}\n\n`);
-                    }
-                }
-            } catch (e) {}
-        }
-
-        if (isFunctionCall) {
-            // Get the full model response to append to history
-            const response = await streamResult.response;
-            const modelMessage = response.candidates[0].content;
-
-            let combinedSources = [];
-            let combinedQuery = "";
-            let functionResponses = [];
-
-            // Execute all function calls concurrently
-            const toolExecutions = functionCalls.map(async (tc) => {
-                if (tc.name === "web_search") {
-                    const query = tc.args.query;
-                    if (query) {
-                        if (res && typeof res.write === "function") {
-                            res.write(`data: ${JSON.stringify({ type: "search_started", query })}\n\n`);
-                        }
-                        const results = await executeWebSearch(query);
-                        return { id: tc.id, name: tc.name, query, results };
-                    }
-                } else if (tc.name === "generate_image") {
-                    const imgPrompt = tc.args.prompt || "image";
-
-                    // ── GENERATE URL AND STREAM MARKDOWN ──
-                    // Safety check is now handled by the main model's system prompt instructions
-                    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imgPrompt)}?width=1024&height=1024&nologo=true`;
-                    const md = `\n\n![${imgPrompt}](${imageUrl})\n\n`;
-                    
-                    // Stream the markdown immediately so it renders in the chat UI
-                    if (res && typeof res.write === "function") {
-                        res.write(`data: ${JSON.stringify({ token: md })}\n\n`);
-                        fullReply += md; // Append markdown to the actual message history
-                    }
-
-                    return { id: tc.id, name: tc.name, query: imgPrompt, results: [{ content: md }] };
-                }
-                return { id: tc.id, name: tc.name, query: null, results: [] };
-            });
-
-            const resolvedTools = await Promise.all(toolExecutions);
-
-            for (const resolved of resolvedTools) {
-                const results = resolved.results;
-                
-                let toolResultObj = {};
-                if (resolved.name === "web_search") {
-                    if (resolved.query) combinedQuery += (combinedQuery ? ", " : "") + resolved.query;
-                    combinedSources.push(...results);
-                    toolResultObj = results.length > 0 
-                        ? { sources: results }
-                        : { error: "No relevant information found." };
-                } else if (resolved.name === "generate_image") {
-                    toolResultObj = {
-                        status: "SUCCESS",
-                        message: "The image has been generated.",
-                        markdown_to_display: results[0].content
-                    };
-                }
-
-                let functionResponsePart = {
-                    name: resolved.name,
-                    response: toolResultObj
-                };
-                
-                // Newer Gemini API versions require the id to match the functionCall
-                if (resolved.id) {
-                    functionResponsePart.id = resolved.id;
-                }
-
-                functionResponses.push({
-                    functionResponse: functionResponsePart
-                });
-            }
-
-            if (combinedSources.length > 0) {
-                searchMetadata = { query: combinedQuery, sources: combinedSources };
-                if (res && typeof res.write === "function") {
-                    res.write(`data: ${JSON.stringify({ type: "search_completed", sources: combinedSources })}\n\n`);
-                }
-            }
-
-            // ── BYPASS thought_signature VALIDATOR ──
-            // Newer Gemini models require a thought_signature in the functionCall. 
-            // If the SDK strips it, returning the call throws a 400 Bad Request.
-            // Google explicitly supports this string to bypass the strict check.
-            if (modelMessage && Array.isArray(modelMessage.parts)) {
-                modelMessage.parts.forEach(part => {
-                    if (part.functionCall) {
-                        part.thoughtSignature = "skip_thought_signature_validator";
-                        // Also clear any previous incorrect bypass just in case
-                        delete part.functionCall.thought_signature;
-                    }
-                });
-            }
-
-            // Start 2nd Stream with function response
-            const newContents = [
-                ...formattedMessages,
-                modelMessage,
-                {
-                    role: "user", 
-                    parts: functionResponses
-                }
-            ];
-
-            const stream2 = await executeWithRetry(() => {
-                logGeminiCall(model, "geminiChatStream - tool execution response (second stream)");
-                return modelInstance.generateContentStream({ contents: newContents });
-            });
-            
-            for await (const chunk of stream2.stream) {
-                try {
-                    const text = chunk.text();
-                    if (text) {
-                        fullReply += text;
-                        if (res && typeof res.write === "function") {
-                            res.write(`data: ${JSON.stringify({ token: text })}\n\n`);
-                        }
-                    }
-                } catch (e) {}
-            }
+        logGeminiCall(model, "geminiChat - response");
+        const result = await executeWithRetry(() => withTimeout(modelInstance.generateContent(req), 12000));
+        fullReply = result.response.text();
+        if (res && typeof res.write === "function") {
+            res.write(`data: ${JSON.stringify({ token: fullReply })}\n\n`);
         }
     } catch (e) {
         console.error("Gemini chat error:", e.message);
         if (res && typeof res.write === "function") {
-            const userFriendlyError = "AskAngel is experiencing high demand right now. Please wait a moment and try again.";
+            const userFriendlyError = e.message?.includes("429")
+                ? "AI usage limit reached. Please try again later."
+                : e.message?.includes("404")
+                    ? "The selected AI model is unavailable. Please choose another model."
+                    : e.message?.includes("timed out")
+                        ? "Gemini is taking too long to respond. Please try again."
+                    : "The AI service is temporarily unavailable. Please try again.";
             res.write(`data: ${JSON.stringify({ error: userFriendlyError })}\n\n`);
         }
     }

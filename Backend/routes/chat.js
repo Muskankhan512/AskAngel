@@ -1,7 +1,7 @@
 import express from "express";
 import Thread from "../models/Thread.js";
 import User from "../models/User.js";
-import { geminiChatStream, generateTitle } from "../utils/gemini.js";
+import { groqChat } from "../utils/groq.js";
 import authMiddleware from "../middleware/auth.js";
 
 const router = express.Router();
@@ -106,8 +106,7 @@ router.get("/chat/search", async (req, res) => {
 
 // ── STREAMING chat route using SSE ──
 router.post("/chat", async (req, res) => {
-    let { threadId, message, language, persona = 'Default Assistant', model = "gemini-2.0-flash" } = req.body;
-    if (!model || typeof model !== 'string' || !model.includes("gemini")) model = "gemini-2.0-flash";
+    const { threadId, message, language, persona = 'Default Assistant' } = req.body;
     if (!threadId || !message) return res.status(400).json({ error: "Missing required fields" });
 
     try {
@@ -153,9 +152,10 @@ router.post("/chat", async (req, res) => {
             thread.messages.push({ role: "user", content: message });
         }
 
-        // Pass entire message history to groqChatStream
+        // Pass the full message history to Groq.
         const activePersona = thread.persona || persona;
-        const { fullReply, searchMetadata } = await geminiChatStream(thread.messages, activePersona, language, res, model);
+        const { fullReply, searchMetadata } = await groqChat(thread.messages, activePersona, language, res);
+        if (!fullReply) return res.end();
 
         // Save full assembled reply to MongoDB
         const newAssistantMessage = { 
@@ -178,23 +178,20 @@ router.post("/chat", async (req, res) => {
 
         // Background title generation for new threads
         if (isNewThread) {
-            generateTitle(message).then(async (newTitle) => {
-                thread.title = newTitle;
-                await thread.save();
-            }).catch(err => console.error("Background title generation failed:", err));
+            thread.title = message.slice(0, 45);
+            await thread.save();
         }
 
     } catch (err) {
         console.log(err);
-        res.write(`data: ${JSON.stringify({ error: "AskAngel is experiencing high demand right now. Please wait a moment and try again." })}\n\n`);
+        res.write(`data: ${JSON.stringify({ error: "Groq AI is temporarily unavailable. Please try again." })}\n\n`);
         res.end();
     }
 });
 
 // ── EDIT message route ──
 router.put("/chat/edit", async (req, res) => {
-    let { threadId, messageIndex, message, language, persona = 'Default Assistant', model = "gemini-2.0-flash" } = req.body;
-    if (!model || typeof model !== 'string' || !model.includes("gemini")) model = "gemini-2.0-flash";
+    const { threadId, messageIndex, message, language, persona = 'Default Assistant' } = req.body;
     if (!threadId || typeof messageIndex !== 'number' || !message) {
         return res.status(400).json({ error: "Missing required fields" });
     }
@@ -235,7 +232,8 @@ router.put("/chat/edit", async (req, res) => {
         thread.messages.push({ role: "user", content: message });
 
         const activePersona = thread.persona || persona;
-        const { fullReply, searchMetadata } = await geminiChatStream(thread.messages, activePersona, language, res, model);
+        const { fullReply, searchMetadata } = await groqChat(thread.messages, activePersona, language, res);
+        if (!fullReply) return res.end();
 
         const newAssistantMessage = { 
             role: "assistant", 
@@ -256,15 +254,14 @@ router.put("/chat/edit", async (req, res) => {
 
     } catch (err) {
         console.log(err);
-        res.write(`data: ${JSON.stringify({ error: "AskAngel is experiencing high demand right now. Please wait a moment and try again." })}\n\n`);
+        res.write(`data: ${JSON.stringify({ error: "Groq AI is temporarily unavailable. Please try again." })}\n\n`);
         res.end();
     }
 });
 
 // ── REGENERATE message route ──
 router.post("/chat/regenerate", async (req, res) => {
-    let { threadId, aiMessageIndex, language, persona = 'Default Assistant', model = "gemini-2.0-flash" } = req.body;
-    if (!model || typeof model !== 'string' || !model.includes("gemini")) model = "gemini-2.0-flash";
+    const { threadId, aiMessageIndex, language, persona = 'Default Assistant' } = req.body;
     if (!threadId || typeof aiMessageIndex !== 'number') {
         return res.status(400).json({ error: "Missing required fields" });
     }
@@ -306,8 +303,9 @@ router.post("/chat/regenerate", async (req, res) => {
 
         const activePersona = thread.persona || persona;
         
-        // Pass the truncated message history (which ends with the user's last message) to Groq/Gemini
-        const { fullReply, searchMetadata } = await geminiChatStream(thread.messages, activePersona, language, res, model);
+        // Pass the truncated message history, ending with the user's last message, to Groq.
+        const { fullReply, searchMetadata } = await groqChat(thread.messages, activePersona, language, res);
+        if (!fullReply) return res.end();
 
         const newAssistantMessage = { 
             role: "assistant", 
@@ -327,7 +325,7 @@ router.post("/chat/regenerate", async (req, res) => {
         res.end();
     } catch (err) {
         console.log(err);
-        res.write(`data: ${JSON.stringify({ error: "AskAngel is experiencing high demand right now. Please wait a moment and try again." })}\n\n`);
+        res.write(`data: ${JSON.stringify({ error: "Groq AI is temporarily unavailable. Please try again." })}\n\n`);
         res.end();
     }
 });

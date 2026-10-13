@@ -110,7 +110,7 @@ const CustomImage = ({ node, src, alt, ...props }) => {
 
 function Chat({ onEditSubmit, onSuggestionClick, onRegenerate, isSearching, streamingSearchMetadata }) {
     const { newChat, prevChats, setPrevChats, loading, streamingText, isStreaming, language, currThreadId, token, handleLogout, persona, user } = useContext(MyContext);
-    const t = translations[language];
+    const t = translations[language] || translations.en;
     const [editingIndex, setEditingIndex] = useState(null);
     const [editValue, setEditValue] = useState("");
     const bottomRef = useRef(null);
